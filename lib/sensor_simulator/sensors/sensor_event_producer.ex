@@ -1,4 +1,5 @@
 defmodule SensorSimulator.Sensors.SensorEventProducer do
+  use GenServer
 
   alias __MODULE__
 
@@ -11,7 +12,7 @@ defmodule SensorSimulator.Sensors.SensorEventProducer do
   # Client interface
   ################################################################################
 
-  def start_link do
+  def start_link(__opts \\ []) do
     IO.puts("SensorEventProducer.start_link")
     GenServer.start_link(__MODULE__, :ok, [name: __MODULE__])
   end
