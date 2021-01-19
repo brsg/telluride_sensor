@@ -1,4 +1,4 @@
-defmodule SensorSimulator.Sensors.SensorEventProducer do
+defmodule SensorSimulator.Messaging.SensorEventProducer do
   use GenServer
 
   alias __MODULE__

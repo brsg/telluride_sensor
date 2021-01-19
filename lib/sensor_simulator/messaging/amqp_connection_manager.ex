@@ -23,7 +23,7 @@ defmodule SensorSimulator.Messaging.AMQPConnectionManager do
 
   def init(:ok) do
     children = [
-      {SensorSimulator.Sensors.SensorEventProducer, []},
+      {SensorSimulator.Messaging.SensorEventProducer, []},
     ]
     Supervisor.start_link(children, strategy: :one_for_one, name: SensorSimulator.Messaging.AMQPConsumerSupervisor)
     IO.puts("AMQPConnectionManager.init - after Supervisor.start_link")
