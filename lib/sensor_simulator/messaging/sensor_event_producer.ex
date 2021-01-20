@@ -13,12 +13,10 @@ defmodule SensorSimulator.Messaging.SensorEventProducer do
   ################################################################################
 
   def start_link(__opts \\ []) do
-    IO.puts("SensorEventProducer.start_link")
     GenServer.start_link(__MODULE__, :ok, [name: __MODULE__])
   end
 
   def channel_available(channel) do
-    IO.puts("SensorEventProducer.channel_available called with #{inspect channel}")
     GenServer.cast(__MODULE__, {:channel_available, channel})
   end
 
@@ -28,7 +26,6 @@ defmodule SensorSimulator.Messaging.SensorEventProducer do
   end
 
   def publish(message) when is_binary(message) do
-    IO.puts("SensorEventProducer.publish called with #{inspect message}")
     GenServer.call(__MODULE__, {:publish, message, @routing_key})
   end
 
@@ -37,13 +34,11 @@ defmodule SensorSimulator.Messaging.SensorEventProducer do
   ################################################################################
 
   def init(_) do
-    IO.puts("SensorEventProducer.init(_)")
     SensorSimulator.Messaging.AMQPConnectionManager.request_channel(__MODULE__)
     {:ok, nil}
   end
 
   def handle_cast({:channel_available, channel}, _state) do
-    IO.puts("SensorEventProducer.handle_cast({:channel_available, chan}, _state) called with #{inspect channel}");
     setup_queue(channel)
     {:noreply, channel}
   end
@@ -65,10 +60,7 @@ defmodule SensorSimulator.Messaging.SensorEventProducer do
   ################################################################################
 
   defp setup_queue(channel) do
-    IO.puts("SensorEventProducer.setup_queue(#{inspect channel})")
-
     # Declare the error queue
-    IO.puts("SensorEventProducer.setup_queue - declaring queue '#{@error_queue}'")
     {:ok, _} = AMQP.Queue.declare(
       channel,
       @error_queue,
@@ -78,7 +70,6 @@ defmodule SensorSimulator.Messaging.SensorEventProducer do
     # Declare the message queue
     # Messages that cannot be delivered to any consumer in the
     # message queue will be routed to the error queue
-    IO.puts("SensorEventProducer.setup_queue - declaring queue '#{@message_queue}'")
     {:ok, _} = AMQP.Queue.declare(
       channel,
       @message_queue,
@@ -90,11 +81,9 @@ defmodule SensorSimulator.Messaging.SensorEventProducer do
     )
 
     # Declare an exchange of type direct
-    IO.puts("SensorEventProducer.setup_queue - declaring exchange '#{@exchange}'")
     :ok = AMQP.Exchange.direct(channel, @exchange, durable: true)
 
     # Bind the main queue to the exchange
-    IO.puts("SensorEventProducer.setup_queue - binding queue '#{@message_queue}' to exchange '#{@exchange}'")
     :ok = AMQP.Queue.bind(channel, @message_queue, @exchange, routing_key: @routing_key)
   end
 
