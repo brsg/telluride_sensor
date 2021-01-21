@@ -2,6 +2,7 @@ defmodule SensorSimulator.Sensors.TemperatureSensor do
   use GenServer
 
   alias SensorSimulator.Messaging.SensorEventProducer
+  alias SensorSimulator.Sensors.SensorRegistry
 
   @emit_interval_ms 2_000
 
@@ -9,9 +10,8 @@ defmodule SensorSimulator.Sensors.TemperatureSensor do
   # Client interface
   ################################################################################
 
-  def start_link(module, init_arg, options \\ []) do
-    IO.puts("TemperatureSensor.start_link called with module #{inspect module}, init_arg #{inspect init_arg} and options #{inspect options}")
-    GenServer.start_link(__MODULE__, init_arg, [name: __MODULE__])
+  def start_link(_, sensor_config) do
+    GenServer.start_link(__MODULE__, sensor_config, name: via_tuple(sensor_config))
   end
 
   ################################################################################
@@ -19,6 +19,7 @@ defmodule SensorSimulator.Sensors.TemperatureSensor do
   ################################################################################
 
   def init(sensor_config) do
+    IO.puts("TemperatureSensor.init with sensor_config #{inspect sensor_config}")
 
     # schedule to emit a sensor after @emit_interval_ms
     schedule_emit_task(@emit_interval_ms)
@@ -58,6 +59,10 @@ defmodule SensorSimulator.Sensors.TemperatureSensor do
       timestamp: DateTime.utc_now() |> DateTime.to_iso8601(),
       reading: reading
     }
+  end
+
+  def via_tuple(sensor_config) do
+    SensorRegistry.via_tuple(sensor_config[:device_id], sensor_config[:sensor_id])
   end
 
 end

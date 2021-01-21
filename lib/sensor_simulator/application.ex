@@ -6,8 +6,9 @@ defmodule SensorSimulator.Application do
   def start(_type, _args) do
     IO.puts("\SensorSimulator.Application start\n")
     children = [
-      {SensorSimulator.Messaging.AMQPConnectionManager, []},
-      {SensorSimulator.Sensors.SensorSupervisor, []}
+      SensorSimulator.Messaging.AMQPConnectionManager,
+      SensorSimulator.Sensors.SensorRegistry,
+      SensorSimulator.Sensors.SensorSupervisor
     ]
     opts = [strategy: :one_for_one, name: SensorSimulator.Supervisor]
     Supervisor.start_link(children, opts)
