@@ -4,8 +4,8 @@ defmodule SensorSimulator.Sensors.SensorRegistry do
     Registry.start_link(keys: :unique, name: __MODULE__)
   end
 
-  def via_tuple(device_id, sensor_id) do
-    {:via, Registry, {__MODULE__, registry_id(device_id, sensor_id)}}
+  def via_tuple(line_id, device_id, sensor_id) do
+    {:via, Registry, {__MODULE__, registry_id(line_id, device_id, sensor_id)}}
   end
 
   def child_spec(_) do
@@ -16,8 +16,8 @@ defmodule SensorSimulator.Sensors.SensorRegistry do
     )
   end
 
-  def registry_id(device_id, sensor_id) do
-    "#{device_id}_#{sensor_id}"
+  def registry_id(line_id, device_id, sensor_id) do
+    "#{line_id}-#{device_id}-#{sensor_id}"
   end
 
 end

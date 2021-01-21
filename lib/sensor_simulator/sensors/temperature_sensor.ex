@@ -54,15 +54,20 @@ defmodule SensorSimulator.Sensors.TemperatureSensor do
 
   def sensor_reading_message(sensor_config, reading) do
     %{
+      line_id:   sensor_config[:line_id],
       device_id: sensor_config[:device_id],
       sensor_id: sensor_config[:sensor_id],
       timestamp: DateTime.utc_now() |> DateTime.to_iso8601(),
-      reading: reading
+      reading:   reading
     }
   end
 
   def via_tuple(sensor_config) do
-    SensorRegistry.via_tuple(sensor_config[:device_id], sensor_config[:sensor_id])
+    SensorRegistry.via_tuple(
+      sensor_config[:line_id],
+      sensor_config[:device_id],
+      sensor_config[:sensor_id]
+    )
   end
 
 end
