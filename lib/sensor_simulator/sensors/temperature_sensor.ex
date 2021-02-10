@@ -22,10 +22,10 @@ defmodule SensorSimulator.Sensors.TemperatureSensor do
     IO.puts("TemperatureSensor.init with sensor_config #{inspect sensor_config}")
 
     # register sensor for publishing
-    sensor_id = String.to_atom(sensor_config[:sensor_id])
-    line_id = sensor_config[:line_id]     # used for version
-    device_id = sensor_config[:device_id] # used for description
-    Scenic.Sensor.register(sensor_id, line_id, device_id)
+    # sensor_id = String.to_atom(sensor_config[:sensor_id])
+    # line_id = sensor_config[:line_id]     # used for version
+    # device_id = sensor_config[:device_id] # used for description
+    # Scenic.Sensor.register(sensor_id, line_id, device_id)
 
     # schedule to emit a sensor after @emit_interval_ms
     schedule_emit_task(@emit_interval_ms)
@@ -33,13 +33,14 @@ defmodule SensorSimulator.Sensors.TemperatureSensor do
     {:ok, %{config: sensor_config}}
   end
 
-  def handle_info(:emit, %{config: sensor_config}) do
+  def handle_info(:emit, %{config: sensor_config} = map) do
+    IO.inspect(map, label: "handle_info map: ")
 
     # compute a new sensor reading
     sensor_reading = :rand.normal(sensor_config[:mean], sensor_config[:variance])
 
     # publish reading to registered devices
-    sensor_id = String.to_atom(sensor_config[:sensor_id])
+    sensor_id = sensor_config[:sensor_id]
     Scenic.Sensor.publish(sensor_id, sensor_reading)
 
     # build sensor reading message

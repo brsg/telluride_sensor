@@ -7,10 +7,12 @@ defmodule SensorSimulator.Scene.Dashboard do
   alias Scenic.Component.Button
   import Scenic.Primitives
   import Scenic.Components
+  alias Scenic.Sensor
 
-  alias SensorSimulator.Component.Sensor
+  alias SensorSimulator.Component.SensorView
   alias SensorSimulator.Data.LineConfig
   alias SensorSimulator.Data.Device
+  alias SensorSimulator.Sensors.SensorSupervisor
 
   @telluride_image :code.priv_dir(:sensor_simulator)
     |> Path.join("/static/images/brsgMtnOnlyThin-Clear_telluride_171_by_90.png")
@@ -84,26 +86,48 @@ defmodule SensorSimulator.Scene.Dashboard do
     {:cont, event, graph, push: graph}
   end
 
+  defp register_sensor(%Device{} = device) do
+    sensor_id = Device.get_id(device)     # Is an atom
+    line_id = to_string(device.mfg_line)  # Used for version
+    device_id = device.device             # Used for description
+    IO.puts("sensor_id #{sensor_id} line_id #{line_id} device_id #{device_id}")
+    Sensor.register(sensor_id, line_id, device_id)
+    # |> IO.inspect(label: "register result: ")
+  end
+
   defp add_pressure_device(mfg_line) do
     case LineConfig.add_pressure_device(mfg_line) do
-      :ok -> Logger.info("TODO: Configure new pressure device for line one.")
-      :max_devices -> Logger.warn("Max devices reached for line one")
+      {:ok, %Device{} = next} ->
+        register_sensor(next)
+        |> IO.inspect(label: "HELLO sensor_id: ")
+        SensorSupervisor.start_sensor(mfg_line, next.device, Device.get_id(next), 75.0, 0.95)
+        |> IO.inspect(label: "start_sensor pressure: ")
+        Logger.info("New pressure device for line one, #{inspect next}.")
+      {:max_devices, _} -> Logger.warn("Max devices reached for line one")
     end
     :ok
   end
 
   defp add_temperature_device(mfg_line) do
     case LineConfig.add_temperature_device(mfg_line) do
-      :ok -> Logger.info("TODO: Configure new temperature device for line one.")
-      :max_devices -> Logger.warn("Max devices reached for line one")
+      {:ok, %Device{} = next} ->
+        register_sensor(next)
+        SensorSupervisor.start_sensor(mfg_line, next.device, Device.get_id(next), 205.0, 0.25)
+        |> IO.inspect(label: "start_sensor temperature: ")
+        Logger.info("New temperature device for line one, #{inspect next}.")
+      {:max_devices, _} -> Logger.warn("Max devices reached for line one")
     end
     :ok
   end
 
   defp add_viscosity_device(mfg_line) do
     case LineConfig.add_viscosity_device(mfg_line) do
-      :ok -> Logger.info("TODO: Configure new viscosity device for line one.")
-      :max_devices -> Logger.warn("Max devices reached for line one")
+      {:ok, %Device{} = next} ->
+        register_sensor(next)
+        SensorSupervisor.start_sensor(mfg_line, next.device, Device.get_id(next), 905.0, 0.25)
+        |> IO.inspect(label: "start_sensor viscosity: ")
+        Logger.info("New viscosity device for line one, #{inspect next}.")
+      {:max_devices, _} -> Logger.warn("Max devices reached for line one")
     end
     :ok
   end
@@ -205,7 +229,7 @@ defmodule SensorSimulator.Scene.Dashboard do
   defp add_to_group(indexed_device_list, group) do
     indexed_device_list
     |> Enum.reduce(group, fn {%Device{} = device, index}, accum_group ->
-      Sensor.add_to_graph(
+      SensorView.add_to_graph(
         accum_group, "", t: {@indent, (index + 1) * @row_height},
         align: :center, id: Device.get_id(device),
         width: rect_width(), height: rect_height(), device_id: device.device,

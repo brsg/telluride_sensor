@@ -27,6 +27,6 @@ defmodule SensorSimulator.Data.Device do
   end
 
   def get_id(%__MODULE__{} = device) do
-    to_string(device.mfg_line) <> "::" <> device.device
+    String.to_atom(to_string(device.mfg_line) <> "::" <> device.device)
   end
 end

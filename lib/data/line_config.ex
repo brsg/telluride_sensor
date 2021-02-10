@@ -60,9 +60,9 @@ defmodule SensorSimulator.Data.LineConfig do
         next_device = compose_next_device(line_key, device_list, sensor_type)
         device_list_prime = [next_device | device_list ] |> Enum.reverse()
         config_map_prime = Map.put(config_map, line_key, device_list_prime)
-        {:ok, config_map_prime}
+        {{:ok, next_device}, config_map_prime}
       false ->
-        {:max_devices, config_map}
+        {{:max_devices, nil}, config_map}
     end
   end
 

@@ -1,4 +1,4 @@
-defmodule SensorSimulator.Component.Sensor do
+defmodule SensorSimulator.Component.SensorView do
   use Scenic.Component
 
   alias Scenic.Graph
