@@ -19,7 +19,6 @@ defmodule SensorSimulator.Sensors.TemperatureSensor do
   ################################################################################
 
   def init(sensor_config) do
-    IO.puts("TemperatureSensor.init with sensor_config #{inspect sensor_config}")
 
     # register sensor for publishing
     sensor_id = Keyword.get(sensor_config, :sensor_id)
@@ -34,15 +33,13 @@ defmodule SensorSimulator.Sensors.TemperatureSensor do
     {:ok, %{config: sensor_config}}
   end
 
-  def handle_info(:emit, %{config: sensor_config} = _map) do
-    # IO.inspect(map, label: "handle_info map: ")
+  def handle_info(:emit, %{config: sensor_config}) do
 
     # compute a new sensor reading
     sensor_reading = :rand.normal(sensor_config[:mean], sensor_config[:variance])
 
     # publish reading to registered devices
     sensor_id = sensor_config[:sensor_id]
-    IO.puts("PUBLISHING reading #{sensor_reading} to sensor_id #{sensor_id}")
     Scenic.Sensor.publish(sensor_id, sensor_reading)
 
     # build sensor reading message

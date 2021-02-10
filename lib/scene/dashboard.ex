@@ -28,7 +28,7 @@ defmodule SensorSimulator.Scene.Dashboard do
   @num_sensor_types 3
 
   def init(_data, opts) do
-    IO.inspect(opts, label: "opts: ")
+    # IO.inspect(opts, label: "opts: ")
 
     Scenic.Cache.Static.Texture.load(@telluride_image, @telluride_hash)
 
@@ -88,10 +88,10 @@ defmodule SensorSimulator.Scene.Dashboard do
 
   def handle_info({:sensor, :data, {sensor_id, reading, _}} = data, graph) do
     IO.inspect(data, label: "dashboard handle_info data: ")
-    reading_rounded =
-      reading
-      |> :erlang.float_to_binary(decimals: 2)
-    graph = Graph.modify(graph, sensor_id, &text(&1, reading_rounded))
+    # reading_rounded =
+      # reading
+      # |> :erlang.float_to_binary(decimals: 2)
+    # graph = Graph.modify(graph, sensor_id, &text(&1, reading_rounded))
     {:noreply, graph, push: graph}
   end
 
@@ -100,27 +100,9 @@ defmodule SensorSimulator.Scene.Dashboard do
     {:cont, event, graph, push: graph}
   end
 
-  defp register_sensor(%Device{} = device) do
-    sensor_id = Device.get_id(device)     # Is an atom
-    line_id = to_string(device.mfg_line)  # Used for version
-    device_id = device.device             # Used for description
-    IO.puts("sensor_id #{sensor_id} line_id #{line_id} device_id #{device_id}")
-    Sensor.register(sensor_id, line_id, device_id)
-    # |> IO.inspect(label: "register result: ")
-  end
-
-  defp subscribe(%Device{} = device) do
-    sensor_id = Device.get_id(device)
-    IO.inspect(sensor_id, label: "subscribe to sensor_id: ")
-    Sensor.subscribe(sensor_id)
-  end
-
   defp add_pressure_device(mfg_line) do
     case LineConfig.add_pressure_device(mfg_line) do
       {:ok, %Device{} = next} ->
-        # subscribe(next)
-        # register_sensor(next)
-        # |> IO.inspect(label: "HELLO sensor_id: ")
         SensorSupervisor.start_sensor(mfg_line, next.device, Device.get_id(next), 75.0, 0.95)
         |> IO.inspect(label: "start_sensor pressure: ")
         Logger.info("New pressure device for line one, #{inspect next}.")
@@ -132,8 +114,6 @@ defmodule SensorSimulator.Scene.Dashboard do
   defp add_temperature_device(mfg_line) do
     case LineConfig.add_temperature_device(mfg_line) do
       {:ok, %Device{} = next} ->
-        # subscribe(next)
-        # register_sensor(next)
         SensorSupervisor.start_sensor(mfg_line, next.device, Device.get_id(next), 205.0, 0.25)
         |> IO.inspect(label: "start_sensor temperature: ")
         Logger.info("New temperature device for line one, #{inspect next}.")
@@ -145,8 +125,6 @@ defmodule SensorSimulator.Scene.Dashboard do
   defp add_viscosity_device(mfg_line) do
     case LineConfig.add_viscosity_device(mfg_line) do
       {:ok, %Device{} = next} ->
-        # subscribe(next)
-        # register_sensor(next)
         SensorSupervisor.start_sensor(mfg_line, next.device, Device.get_id(next), 905.0, 0.25)
         |> IO.inspect(label: "start_sensor viscosity: ")
         Logger.info("New viscosity device for line one, #{inspect next}.")

@@ -61,19 +61,14 @@ defmodule SensorSimulator.Component.SensorView do
   end
 
   def handle_info({:sensor, :data, {sensor_id, reading, _}} = data, graph_map) do
-    IO.inspect(data, label: "sensor_view handle_info data: ")
-    IO.inspect(graph_map, label: "\tsensor_view graph: ")
     reading_rounded =
       reading
       |> :erlang.float_to_binary(decimals: 2)
-    IO.inspect(reading_rounded, label: "\treading_rounded: ")
 
     si_string = to_string(sensor_id)
     [_line | [label]] = String.split(si_string, "::")
-    IO.inspect(label, label: "\tLABEL: ")
 
     graph = Graph.modify(graph_map[:graph], sensor_id, &text(&1, ~s|#{label}: #{reading_rounded}|))
-    IO.inspect(graph, label: "\tPOST modify graph: ")
     graph_map = Map.put(graph_map, :graph, graph)
 
     {:noreply, graph_map, push: graph}
@@ -81,7 +76,7 @@ defmodule SensorSimulator.Component.SensorView do
 
   ## Private / Helping
   defp fill_color(opts) do
-    IO.inspect(opts, label: "fill_color opts: ")
+    # IO.inspect(opts, label: "fill_color opts: ")
     case opts[:styles][:sensor_type] do
       :pressure -> {:cadet_blue, 255}
       :temperature -> {:cornflower_blue, 255}
@@ -92,7 +87,7 @@ defmodule SensorSimulator.Component.SensorView do
 
   ## stroke colors: lime, yellow, orange, tomato
   defp stroke_color(opts) do
-    IO.inspect(opts, label: "stroke_color opts: ")
+    # IO.inspect(opts, label: "stroke_color opts: ")
     case opts[:styles][:sensor_state] do
       :healthy -> {3, :lime}
       :warn -> {3, :yellow}
