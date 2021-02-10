@@ -1,12 +1,13 @@
-defmodule SensorSimulator.Application do
-  @moduledoc false
-
-  # use Application
+defmodule TellurideDevice do
+  @moduledoc """
+  Starter application using the Scenic framework.
+  """
 
   def start(_type, _args) do
-    IO.puts("\SensorSimulator.Application start\n")
-    main_viewport_config = Application.get_env(:sensor_simulator, :viwport)
+    # load the viewport configuration from config
+    main_viewport_config = Application.get_env(:sensor_simulator, :viewport)
 
+    # start the application with the viewport
     children = [
       SensorSimulator.Messaging.AMQPConnectionManager,
       SensorSimulator.Sensors.SensorRegistry,
@@ -15,9 +16,7 @@ defmodule SensorSimulator.Application do
       SensorSimulator.Data.LineConfig,
       {Scenic, viewports: [main_viewport_config]}
     ]
-    # opts = [strategy: :one_for_one, name: SensorSimulator.Supervisor]
-    # Supervisor.start_link(children, opts)
+
     Supervisor.start_link(children, strategy: :one_for_one)
   end
-
 end
