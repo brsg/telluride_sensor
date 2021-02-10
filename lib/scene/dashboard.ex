@@ -81,6 +81,11 @@ defmodule SensorSimulator.Scene.Dashboard do
     build_and_push_graph(event)
   end
 
+  def handle_info(data, graph) do
+    IO.inspect(data, label: "dashboard handle_info data: ")
+    {:noreply, graph, push: graph}
+  end
+
   defp build_and_push_graph(event) do
     graph = build_graph()
     {:cont, event, graph, push: graph}
@@ -98,8 +103,8 @@ defmodule SensorSimulator.Scene.Dashboard do
   defp add_pressure_device(mfg_line) do
     case LineConfig.add_pressure_device(mfg_line) do
       {:ok, %Device{} = next} ->
-        register_sensor(next)
-        |> IO.inspect(label: "HELLO sensor_id: ")
+        # register_sensor(next)
+        # |> IO.inspect(label: "HELLO sensor_id: ")
         SensorSupervisor.start_sensor(mfg_line, next.device, Device.get_id(next), 75.0, 0.95)
         |> IO.inspect(label: "start_sensor pressure: ")
         Logger.info("New pressure device for line one, #{inspect next}.")
@@ -111,7 +116,7 @@ defmodule SensorSimulator.Scene.Dashboard do
   defp add_temperature_device(mfg_line) do
     case LineConfig.add_temperature_device(mfg_line) do
       {:ok, %Device{} = next} ->
-        register_sensor(next)
+        # register_sensor(next)
         SensorSupervisor.start_sensor(mfg_line, next.device, Device.get_id(next), 205.0, 0.25)
         |> IO.inspect(label: "start_sensor temperature: ")
         Logger.info("New temperature device for line one, #{inspect next}.")
@@ -123,7 +128,7 @@ defmodule SensorSimulator.Scene.Dashboard do
   defp add_viscosity_device(mfg_line) do
     case LineConfig.add_viscosity_device(mfg_line) do
       {:ok, %Device{} = next} ->
-        register_sensor(next)
+        # register_sensor(next)
         SensorSupervisor.start_sensor(mfg_line, next.device, Device.get_id(next), 905.0, 0.25)
         |> IO.inspect(label: "start_sensor viscosity: ")
         Logger.info("New viscosity device for line one, #{inspect next}.")
