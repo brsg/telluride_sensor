@@ -13,7 +13,7 @@ defmodule SensorSimulator.Scene.Dashboard do
   alias SensorSimulator.Data.Device
 
   @telluride_image :code.priv_dir(:sensor_simulator)
-    |> Path.join("/static/images/brsgMtnOnlyThin-Clear_telluride_by_BRSG_171_by_90.png")
+    |> Path.join("/static/images/brsgMtnOnlyThin-Clear_telluride_171_by_90.png")
   @telluride_hash Scenic.Cache.Support.Hash.file!(@telluride_image, :sha)
   @title "A Polyglot Demo of Pure Elixir"
   @sub_title "Glass to Analytics"
