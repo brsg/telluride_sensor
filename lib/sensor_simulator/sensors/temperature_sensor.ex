@@ -26,7 +26,7 @@ defmodule SensorSimulator.Sensors.TemperatureSensor do
     line_id = to_string(Keyword.get(sensor_config, :line_id))     # used for version
     device_id = Keyword.get(sensor_config, :device_id) # used for description
     Scenic.Sensor.register(sensor_id, line_id, device_id)
-    Scenic.Sensor.publish(sensor_id, "FIRST PUB")
+    Scenic.Sensor.publish(sensor_id, 0.0)
 
     # schedule to emit a sensor after @emit_interval_ms
     schedule_emit_task(@emit_interval_ms)
@@ -34,8 +34,8 @@ defmodule SensorSimulator.Sensors.TemperatureSensor do
     {:ok, %{config: sensor_config}}
   end
 
-  def handle_info(:emit, %{config: sensor_config} = map) do
-    IO.inspect(map, label: "handle_info map: ")
+  def handle_info(:emit, %{config: sensor_config} = _map) do
+    # IO.inspect(map, label: "handle_info map: ")
 
     # compute a new sensor reading
     sensor_reading = :rand.normal(sensor_config[:mean], sensor_config[:variance])

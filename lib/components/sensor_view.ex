@@ -20,11 +20,11 @@ defmodule SensorSimulator.Component.SensorView do
     height = opts[:styles][:height]
     device_id = opts[:styles][:device_id]
     sensor_type = opts[:styles][:sensor_type]
-    text_id = device_id <> "::" <> to_string(sensor_type)
     radius = opts[:styles][:radius] || @radius
     fill_color_tuple = fill_color(opts)
     stroke_tuple = stroke_color(opts)
     sensor_id = opts[:id]
+    text_id = sensor_id
 
     initial_reading =
       case reading == "" do
@@ -55,9 +55,28 @@ defmodule SensorSimulator.Component.SensorView do
     {:ok, %{graph: graph, viewport: opts[:viewport]}, push: graph}
   end
 
-  def handle_info(data, graph) do
-    IO.inspect(data, label: "handle_info data: ")
+  def handle_info({:sensor, :registered, {_sensor_id, _version, _description}} = data, graph) do
+    IO.inspect(data, label: "sensor_view handle_info registered: ")
     {:noreply, graph, push: graph}
+  end
+
+  def handle_info({:sensor, :data, {sensor_id, reading, _}} = data, graph_map) do
+    IO.inspect(data, label: "sensor_view handle_info data: ")
+    IO.inspect(graph_map, label: "\tsensor_view graph: ")
+    reading_rounded =
+      reading
+      |> :erlang.float_to_binary(decimals: 2)
+    IO.inspect(reading_rounded, label: "\treading_rounded: ")
+
+    si_string = to_string(sensor_id)
+    [_line | [label]] = String.split(si_string, "::")
+    IO.inspect(label, label: "\tLABEL: ")
+
+    graph = Graph.modify(graph_map[:graph], sensor_id, &text(&1, ~s|#{label}: #{reading_rounded}|))
+    IO.inspect(graph, label: "\tPOST modify graph: ")
+    graph_map = Map.put(graph_map, :graph, graph)
+
+    {:noreply, graph_map, push: graph}
   end
 
   ## Private / Helping
