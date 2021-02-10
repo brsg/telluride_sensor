@@ -8,7 +8,7 @@ defmodule SensorSimulator.Scene.Dashboard do
   import Scenic.Primitives
   import Scenic.Components
 
-  alias SensorSimulator.Component.Temperature
+  alias SensorSimulator.Component.Sensor
   alias SensorSimulator.Data.LineConfig
   alias SensorSimulator.Data.Device
 
@@ -205,7 +205,7 @@ defmodule SensorSimulator.Scene.Dashboard do
   defp add_to_group(indexed_device_list, group) do
     indexed_device_list
     |> Enum.reduce(group, fn {%Device{} = device, index}, accum_group ->
-      Temperature.add_to_graph(
+      Sensor.add_to_graph(
         accum_group, "", t: {@indent, (index + 1) * @row_height},
         align: :center, id: Device.get_id(device),
         width: rect_width(), height: rect_height(), device_id: device.device,

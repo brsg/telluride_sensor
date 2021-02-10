@@ -1,4 +1,4 @@
-defmodule SensorSimulator.Component.Temperature do
+defmodule SensorSimulator.Component.Sensor do
   use Scenic.Component
 
   alias Scenic.Graph
