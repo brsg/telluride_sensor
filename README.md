@@ -1,21 +1,18 @@
 # SensorSimulator
 
-**TODO: Add description**
+SensorSimulator generates (using a normal / Gaussian distribution) and publishes a stream of simulated temperature sensor readings to a RabbitMQ topic.
 
-## Installation
+Any number of TemperatureSensor processes can be started, each of which is configured with: 
+* line_id - the id of the manufacturing line on which the sensor is deployed
+* device_id - the id of the device on the manufacturing line on which the sensor is located
+* sensor_id - the id of the sensor
+* mean - a mean temperature for the sensor
+* variance - a variance for use, in combination with `mean`, to generate sensor readings using a normal distribution
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `sensor_simulator` to your list of dependencies in `mix.exs`:
-
-```elixir
-def deps do
-  [
-    {:sensor_simulator, "~> 0.1.0"}
-  ]
-end
+Each sensor will emit a reading every 2 seconds of the following structure:
 ```
-
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/sensor_simulator](https://hexdocs.pm/sensor_simulator).
+{
+  
+}
+```
 
