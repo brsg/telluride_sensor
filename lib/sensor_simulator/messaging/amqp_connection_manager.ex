@@ -17,6 +17,10 @@ defmodule SensorSimulator.Messaging.AMQPConnectionManager do
     end
   end
 
+  def request_channel(consumer) do
+    GenServer.cast(__MODULE__, {:chan_request, consumer})
+  end
+
   ################################################################################
   # Server callbacks
   ################################################################################
@@ -26,8 +30,6 @@ defmodule SensorSimulator.Messaging.AMQPConnectionManager do
       {SensorSimulator.Messaging.SensorEventProducer, []},
     ]
     Supervisor.start_link(children, strategy: :one_for_one, name: SensorSimulator.Messaging.AMQPConsumerSupervisor)
-    IO.puts("AMQPConnectionManager.init - after Supervisor.start_link")
-
     establish_new_connection()
   end
 
@@ -36,16 +38,13 @@ defmodule SensorSimulator.Messaging.AMQPConnectionManager do
   end
 
   def handle_cast({:chan_request, consumer}, {conn, channel_mappings}) do
-    IO.puts("AMQPConnectionManager.handle_cast({:chan_request, consumer}, {conn, channel_mappings}) called")
     new_mapping = store_channel_mapping(conn, consumer, channel_mappings)
     channel = Map.get(new_mapping, consumer)
     consumer.channel_available(channel)
-
     {:noreply, {conn, new_mapping}}
   end
 
   def handle_info({:DOWN, _, :process, _pid, reason}, _) do
-    # Stop GenServer. Will be restarted by Supervisor.
     {:stop, {:connection_lost, reason}, nil}
   end
 
@@ -75,32 +74,13 @@ defmodule SensorSimulator.Messaging.AMQPConnectionManager do
     ]
   end
 
-  def request_channel(consumer) do
-    IO.puts("AMQPConnectionManager.request_channel called with #{inspect consumer}")
-    GenServer.cast(__MODULE__, {:chan_request, consumer})
-  end
-
   defp store_channel_mapping(conn, consumer, channel_mappings) do
     Map.put_new_lazy(channel_mappings, consumer, fn() -> create_channel(conn) end)
   end
 
-  defp create_channel conn do
+  defp create_channel(conn) do
     {:ok, chan} = Channel.open(conn)
     chan
   end
 
-#  def handle_info(:connect, conn) do
-#    case Connection.open(@host) do
-#      {:ok, conn} ->
-#        # Get notifications when the connection goes down
-#        Process.monitor(conn.pid)
-#        {:noreply, conn}
-#
-#      {:error, _} ->
-#        Logger.error("Failed to connect #{@host}. Reconnecting later...")
-#        # Retry later
-#        Process.send_after(self(), :connect, @reconnect_interval)
-#        {:noreply, nil}
-#    end
-#  end
 end

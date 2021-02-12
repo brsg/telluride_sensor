@@ -60,16 +60,14 @@ defmodule SensorSimulator.Messaging.SensorEventProducer do
   ################################################################################
 
   defp setup_queue(channel) do
-    # Declare the error queue
+    # Declare an error queue
     {:ok, _} = AMQP.Queue.declare(
       channel,
       @error_queue,
       durable: true
     )
 
-    # Declare the message queue
-    # Messages that cannot be delivered to any consumer in the
-    # message queue will be routed to the error queue
+    # Declare a message queue
     {:ok, _} = AMQP.Queue.declare(
       channel,
       @message_queue,
@@ -80,10 +78,10 @@ defmodule SensorSimulator.Messaging.SensorEventProducer do
       ]
     )
 
-    # Declare an exchange of type direct
+    # Declare a direct exchange
     :ok = AMQP.Exchange.direct(channel, @exchange, durable: true)
 
-    # Bind the main queue to the exchange
+    # Bind the message queue to the exchange
     :ok = AMQP.Queue.bind(channel, @message_queue, @exchange, routing_key: @routing_key)
   end
 

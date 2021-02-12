@@ -1,5 +1,4 @@
 defmodule SensorSimulator.Sensors.SensorSupervisor do
-  # Automatically defines child_spec/1
   use DynamicSupervisor
 
   alias SensorSimulator.Sensors.TemperatureSensor

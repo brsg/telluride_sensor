@@ -19,15 +19,13 @@ defmodule SensorSimulator.Sensors.TemperatureSensor do
   ################################################################################
 
   def init(sensor_config) do
-
-    # register sensor for publishing
+    line_id = to_string(Keyword.get(sensor_config, :line_id))
+    device_id = Keyword.get(sensor_config, :device_id)
     sensor_id = Keyword.get(sensor_config, :sensor_id)
-    line_id = to_string(Keyword.get(sensor_config, :line_id))     # used for version
-    device_id = Keyword.get(sensor_config, :device_id) # used for description
     Scenic.Sensor.register(sensor_id, line_id, device_id)
     Scenic.Sensor.publish(sensor_id, 0.0)
 
-    # schedule to emit a sensor after @emit_interval_ms
+    # emit a sensor reading after @emit_interval_ms
     schedule_emit_task(@emit_interval_ms)
 
     {:ok, %{config: sensor_config}}
@@ -36,17 +34,13 @@ defmodule SensorSimulator.Sensors.TemperatureSensor do
   def handle_info(:emit, %{config: sensor_config}) do
 
     # compute a new sensor reading
-    sensor_reading = :rand.normal(sensor_config[:mean], sensor_config[:variance])
+    sensor_reading = read_sensor(sensor_config)
 
     # publish reading to registered devices
-    sensor_id = sensor_config[:sensor_id]
-    Scenic.Sensor.publish(sensor_id, sensor_reading)
+    Scenic.Sensor.publish(sensor_config[:sensor_id], sensor_reading)
 
-    # build sensor reading message
-    message = sensor_reading_message(sensor_config, sensor_reading)
-
-    # emit sensor reading message
-    SensorEventProducer.publish(message)
+    # publish sensor reading message to event queue
+    SensorEventProducer.publish(sensor_reading_message(sensor_config, sensor_reading))
 
     # schedule to emit a sensor after @emit_interval_ms
     schedule_emit_task(@emit_interval_ms)
@@ -58,11 +52,15 @@ defmodule SensorSimulator.Sensors.TemperatureSensor do
   # Private
   ################################################################################
 
-  def schedule_emit_task(time) do
+  defp schedule_emit_task(time) do
     Process.send_after(self(), :emit, time)
   end
 
-  def sensor_reading_message(sensor_config, reading) do
+  defp read_sensor(sensor_config) do
+    :rand.normal(sensor_config[:mean], sensor_config[:variance])
+  end
+
+  defp sensor_reading_message(sensor_config, reading) do
     %{
       line_id:   sensor_config[:line_id],
       device_id: sensor_config[:device_id],

@@ -11,11 +11,17 @@ defmodule SensorSimulator.Messaging.SensorEventConsumer do
   # Client interface
   ################################################################################
 
+  @doc """
+  Start a SensorEventConsumer process
+  """
   def start_link do
     IO.puts("SensorEventConsumer.start_link")
     GenServer.start_link(__MODULE__, :ok, [name: __MODULE__])
   end
 
+  @doc """
+  Receive notification from the AMQP Connection Manager that a channel is available.
+  """
   def channel_available(chan) do
     IO.puts("SensorEventConsumer.channel_available called with #{inspect chan}")
     GenServer.cast(__MODULE__, {:channel_available, chan})
@@ -25,43 +31,56 @@ defmodule SensorSimulator.Messaging.SensorEventConsumer do
   # Server callbacks
   ################################################################################
 
+  @doc """
+  Initialize this process by requesting an AMQP channel from
+  the AMQP Connection Manager
+  """
   def init(_) do
     IO.puts("SensorEventConsumer.init(_)")
     SensorSimulator.Messaging.AMQPConnectionManager.request_channel(__MODULE__)
     {:ok, nil}
   end
 
+  @doc """
+  Receive notification from the AMQP Connection Manager that
+  a channel is available
+
+  ## Parameters
+
+    - channel: the AMQP channel allocated by the Connection Manager
+  """
   def handle_cast({:channel_available, channel}, _state) do
-    # IO.puts("SensorEventConsumer.handle_cast({:channel_available, chan}, _state) called with #{inspect channel}");
     setup_queue(channel)
-    # Limit unacknowledged messages to 10
     :ok = AMQP.Basic.qos(channel, prefetch_count: 10)
-    # Register the GenServer process as a consumer
     {:ok, _consumer_tag} = AMQP.Basic.consume(channel, @message_queue)
     {:noreply, channel}
   end
 
-  # Confirmation sent by the broker after registering this process as a consumer
+  @doc """
+  Receive confirmation from the broker that this process was registered as a consumer
+  """
   def handle_info({:basic_consume_ok, %{consumer_tag: _consumer_tag}}, channel) do
-    # IO.puts("SensorEventConsumer.handle_info({:basic_consume_ok, %{consumer_tag: consumer_tag}}, channel)")
     {:noreply, channel}
   end
 
-  # Sent by the broker when the consumer is unexpectedly cancelled (such as after a queue deletion)
+  @doc """
+  Receive notification from the broker that this consumer was cancelled
+  """
   def handle_info({:basic_cancel, %{consumer_tag: _consumer_tag}}, channel) do
-  #   IO.puts("SensorEventConsumer.handle_info({:basic_cancel, %{consumer_tag: consumer_tag}}, channel)")
     {:stop, :normal, channel}
   end
 
-  # Confirmation sent by the broker to the consumer process after a Basic.cancel
+  @doc """
+  Receive confirmation from the broker for a Basic.cancel
+  """
   def handle_info({:basic_cancel_ok, %{consumer_tag: _consumer_tag}}, channel) do
-  #   IO.puts("SensorEventConsumer.handle_info({:basic_cancel_ok, %{consumer_tag: consumer_tag}}, channel)")
     {:noreply, channel}
   end
 
+  @doc """
+  Receive notification from the broker that a message has been delivered
+  """
   def handle_info({:basic_deliver, payload, %{delivery_tag: tag, redelivered: redelivered}}, channel) do
-    # IO.puts("SensorEventConsumer.handle_info({:basic_deliver, payload, %{delivery_tag: tag, redelivered: redelivered}}, channel)")
-    # You might want to run payload consumption in separate Tasks in production
     consume(channel, tag, redelivered, payload)
     {:noreply, channel}
   end
@@ -70,21 +89,19 @@ defmodule SensorSimulator.Messaging.SensorEventConsumer do
   # Private
   ################################################################################
 
+  @doc """
+  Configure the AMQP consumer
+  """
   defp setup_queue(channel) do
-    IO.puts("SensorEventConsumer.setup_queue(#{inspect channel})")
 
-    # Declare the error queue
-    IO.puts("SensorEventConsumer.setup_queue - declaring queue '#{@error_queue}'")
+    # Declare an error queue
     {:ok, _} = AMQP.Queue.declare(
       channel,
       @error_queue,
       durable: true
     )
 
-    # Declare the message queue
-    # Messages that cannot be delivered to any consumer in the
-    # message queue will be routed to the error queue
-    IO.puts("SensorEventConsumer.setup_queue - declaring queue '#{@message_queue}'")
+    # Declare a message queue
     {:ok, _} = AMQP.Queue.declare(
       channel,
       @message_queue,
@@ -95,26 +112,27 @@ defmodule SensorSimulator.Messaging.SensorEventConsumer do
       ]
     )
 
-    # Declare an exchange of type direct
-    IO.puts("SensorEventConsumer.setup_queue - declaring exchange '#{@exchange}'")
+    # Declare a direct exchange
     :ok = AMQP.Exchange.direct(channel, @exchange, durable: true)
 
-    # Bind the main queue to the exchange
-    IO.puts("SensorEventConsumer.setup_queue - binding queue '#{@message_queue}' to exchange '#{@exchange}'")
+    # Bind the message queue to the exchange
     :ok = AMQP.Queue.bind(channel, @message_queue, @exchange, routing_key: @routing_key)
   end
 
-  defp consume(channel, tag, _redelivered, payload) do
+  @doc """
+  Consumer a delivered message and provide acknowledgement
+  """
+  defp consume(channel, delivery_tag, _redelivered, payload) do
     case JSON.decode(payload) do
       {:ok, event_info} ->
         IO.puts("SensorEventConsumer.consume received #{inspect event_info}")
-        AMQP.Basic.ack(channel, tag)
-      {:error, changeset} ->
-        Basic.reject channel, tag, requeue: false
-        IO.puts("error processing payload: #{inspect payload} with changeset: #{inspect changeset}")
+        AMQP.Basic.ack(channel, delivery_tag)
+      {:error, reason} ->
+        Basic.reject channel, delivery_tag, requeue: false
+        IO.puts("error '#{inspect reason}' processing payload: #{inspect payload}")
       err ->
-        Basic.reject channel, tag, requeue: false
-        IO.puts("error #{inspect err} processing payload: #{inspect payload}")
+        Basic.reject channel, delivery_tag, requeue: false
+        IO.puts("error '#{inspect err}'' processing payload: #{inspect payload}")
         err
     end
   end
