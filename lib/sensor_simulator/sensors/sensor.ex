@@ -1,4 +1,4 @@
-defmodule SensorSimulator.Sensors.TemperatureSensor do
+defmodule SensorSimulator.Sensors.Sensor do
   use GenServer, restart: :temporary
 
   alias SensorSimulator.Messaging.SensorEventProducer

@@ -1,7 +1,7 @@
 defmodule SensorSimulator.Sensors.SensorSupervisor do
   use DynamicSupervisor
 
-  alias SensorSimulator.Sensors.TemperatureSensor
+  alias SensorSimulator.Sensors.Sensor
 
   ################################################################################
   # Client interface
@@ -11,8 +11,8 @@ defmodule SensorSimulator.Sensors.SensorSupervisor do
     DynamicSupervisor.start_link(__MODULE__, init_arg, name: __MODULE__)
   end
 
-  def start_sensor(line_id, device_id, sensor_id, mean, variance) do
-    child_spec = {TemperatureSensor, [line_id: line_id, device_id: device_id, sensor_id: sensor_id, mean: mean, variance: variance]}
+  def start_sensor(sensor_type, line_id, device_id, sensor_id, mean, variance) do
+    child_spec = {Sensor, [sensor_type: sensor_type, line_id: line_id, device_id: device_id, sensor_id: sensor_id, mean: mean, variance: variance]}
     DynamicSupervisor.start_child(__MODULE__, child_spec)
   end
 
