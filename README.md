@@ -14,3 +14,4 @@ Each sensor will emit a reading every 2 seconds of the following structure:
 ```
 %{"device_id" => 100, "line_id" => 10, "reading" => 99.02638166702798, "sensor_id" => 1000, "timestamp" => "2021-02-12T01:18:51.838675Z"}
 ```
+
