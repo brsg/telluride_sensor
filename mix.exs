@@ -12,7 +12,6 @@ defmodule SensorSimulator.MixProject do
     ]
   end
 
-  # Run "mix help compile.app" to learn about applications.
   def application do
     [
       # mod: {SensorSimulator.Application, []},
@@ -21,10 +20,11 @@ defmodule SensorSimulator.MixProject do
     ]
   end
 
-  # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      { :amqp, "~> 1.0" },
+      {:credo, "~> 1.5", only: [:dev, :test], runtime: false},
+      {:dialyxir, "~> 1.0", only: [:dev], runtime: false},
+      {:amqp, "~> 1.0" },
       {:json, "~> 1.2"},
       {:scenic, "~> 0.10"},
       {:scenic_driver_glfw, "~> 0.10", targets: :host},
