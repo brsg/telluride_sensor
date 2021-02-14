@@ -1,11 +1,9 @@
-defmodule SensorSimulator.Messaging.SensorEventConsumer do
+defmodule SensorSimulator.Messaging.SensorReadingConsumer do
   use GenServer
   use AMQP
 
-  @exchange       "sensor_events"
-  @message_queue  "events"
-  @error_queue    "errors"
-  @routing_key    "sensor.event"
+  alias SensorSimulator.Messaging.AMQPConnectionManager
+  alias SensorSimulator.Messaging.SensorReadingQueue
 
   ################################################################################
   # Client interface
@@ -15,20 +13,22 @@ defmodule SensorSimulator.Messaging.SensorEventConsumer do
   Start a SensorEventConsumer process
   """
   def start_link do
-    IO.puts("SensorEventConsumer.start_link")
     GenServer.start_link(__MODULE__, :ok, [name: __MODULE__])
   end
+
+  ################################################################################
+  # AMQPConnectionManager callbacks
+  ################################################################################
 
   @doc """
   Receive notification from the AMQP Connection Manager that a channel is available.
   """
-  def channel_available(chan) do
-    IO.puts("SensorEventConsumer.channel_available called with #{inspect chan}")
-    GenServer.cast(__MODULE__, {:channel_available, chan})
+  def channel_available(channel) do
+    GenServer.cast(__MODULE__, {:channel_available, channel})
   end
 
   ################################################################################
-  # Server callbacks
+  # GenServer callbacks
   ################################################################################
 
   @doc """
@@ -36,8 +36,7 @@ defmodule SensorSimulator.Messaging.SensorEventConsumer do
   the AMQP Connection Manager
   """
   def init(_) do
-    IO.puts("SensorEventConsumer.init(_)")
-    SensorSimulator.Messaging.AMQPConnectionManager.request_channel(__MODULE__)
+    AMQPConnectionManager.request_channel(__MODULE__)
     {:ok, nil}
   end
 
@@ -50,74 +49,56 @@ defmodule SensorSimulator.Messaging.SensorEventConsumer do
     - channel: the AMQP channel allocated by the Connection Manager
   """
   def handle_cast({:channel_available, channel}, _state) do
-    setup_queue(channel)
-    :ok = AMQP.Basic.qos(channel, prefetch_count: 10)
-    {:ok, _consumer_tag} = AMQP.Basic.consume(channel, @message_queue)
-    {:noreply, channel}
+    :ok = SensorReadingQueue.register_consumer(channel)
+    {:noreply, %{channel: channel}}
   end
 
   @doc """
   Receive confirmation from the broker that this process was registered as a consumer
   """
-  def handle_info({:basic_consume_ok, %{consumer_tag: _consumer_tag}}, channel) do
-    {:noreply, channel}
+  def handle_info({:basic_consume_ok, %{consumer_tag: consumer_tag}}, %{channel: channel}) do
+    {:noreply, %{channel: channel, consumer_tag: consumer_tag}}
   end
 
   @doc """
   Receive notification from the broker that this consumer was cancelled
   """
-  def handle_info({:basic_cancel, %{consumer_tag: _consumer_tag}}, channel) do
-    {:stop, :normal, channel}
+  def handle_info({:basic_cancel, _}, state) do
+    {:stop, :normal, state}
   end
 
   @doc """
   Receive confirmation from the broker for a Basic.cancel
   """
-  def handle_info({:basic_cancel_ok, %{consumer_tag: _consumer_tag}}, channel) do
-    {:noreply, channel}
+  def handle_info({:basic_cancel_ok, _}, state) do
+    {:noreply, state}
   end
 
   @doc """
   Receive notification from the broker that a message has been delivered
   """
-  def handle_info({:basic_deliver, payload, %{delivery_tag: tag, redelivered: redelivered}}, channel) do
+  def handle_info({:basic_deliver, payload, %{delivery_tag: tag, redelivered: redelivered}}, %{channel: channel, consumer_tag: consumer_tag} = state) do
     consume(channel, tag, redelivered, payload)
-    {:noreply, channel}
+    {:noreply, state}
+  end
+
+  @doc """
+  Receive notification from the broker that a message has been delivered
+  """
+  @impl true
+  def handle_info({:quit, reason}, %{channel: channel, consumer_tag: consumer_tag} = state) do
+     SensorReadingQueue.cancel_consumer(channel, consumer_tag)
+    {:stop, reason, state}
+  end
+
+  @impl true
+  def terminate(reason, %{channel: channel, consumer_tag: consumer_tag} = state) do
+     SensorReadingQueue.cancel_consumer(channel, consumer_tag)
   end
 
   ################################################################################
   # Private
   ################################################################################
-
-  @doc """
-  Configure the AMQP consumer
-  """
-  defp setup_queue(channel) do
-
-    # Declare an error queue
-    {:ok, _} = AMQP.Queue.declare(
-      channel,
-      @error_queue,
-      durable: true
-    )
-
-    # Declare a message queue
-    {:ok, _} = AMQP.Queue.declare(
-      channel,
-      @message_queue,
-      durable: true,
-      arguments: [
-        {"x-dead-letter-exchange", :longstr, ""},
-        {"x-dead-letter-routing-key", :longstr, @error_queue}
-      ]
-    )
-
-    # Declare a direct exchange
-    :ok = AMQP.Exchange.direct(channel, @exchange, durable: true)
-
-    # Bind the message queue to the exchange
-    :ok = AMQP.Queue.bind(channel, @message_queue, @exchange, routing_key: @routing_key)
-  end
 
   @doc """
   Consumer a delivered message and provide acknowledgement
