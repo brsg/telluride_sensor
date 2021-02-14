@@ -3,7 +3,7 @@ defmodule SensorSimulator.Messaging.SensorHealthQueue do
   @exchange         "sensor_events"
 
   @msg_queue        "sensor_health_queue"
-  @msg_routing_key  "sensor_health"
+  @msg_routing_key  "sensor.health"
 
   @dlx_queue        "dlx_queue"
   @dlx_routing_key  "dlx_key"

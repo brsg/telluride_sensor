@@ -3,7 +3,7 @@ defmodule SensorSimulator.Messaging.SensorReadingQueue do
   @exchange         "sensor_events"
 
   @msg_queue        "sensor_reading_queue"
-  @msg_routing_key  "sensor_reading"
+  @msg_routing_key  "sensor.reading"
 
   @dlx_queue        "dlx_queue"
   @dlx_routing_key  "dlx_key"
