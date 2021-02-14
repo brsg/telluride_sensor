@@ -6,8 +6,8 @@ defmodule SensorSimulator.Messaging.AMQPConnectionManager do
   # Client interface
   ################################################################################
 
-  def start_link(_opts \\ []) do
-    GenServer.start_link(__MODULE__, :ok, [name: __MODULE__])
+  def start_link(init_arg) do
+    GenServer.start_link(__MODULE__, init_arg, [name: __MODULE__])
   end
 
   def get_connection do
@@ -25,9 +25,11 @@ defmodule SensorSimulator.Messaging.AMQPConnectionManager do
   # Server callbacks
   ################################################################################
 
-  def init(:ok) do
+  @impl
+  def init(_init_arg) do
     children = [
       {SensorSimulator.Messaging.SensorEventProducer, []},
+      {SensorSimulator.Messaging.SensorHealthConsumer, []},
     ]
     Supervisor.start_link(children, strategy: :one_for_one, name: SensorSimulator.Messaging.AMQPConsumerSupervisor)
     establish_new_connection()

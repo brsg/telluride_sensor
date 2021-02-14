@@ -12,8 +12,8 @@ defmodule SensorSimulator.Messaging.SensorReadingConsumer do
   @doc """
   Start a SensorEventConsumer process
   """
-  def start_link do
-    GenServer.start_link(__MODULE__, :ok, [name: __MODULE__])
+  def start_link(init_arg) do
+    GenServer.start_link(__MODULE__, init_arg, [name: __MODULE__])
   end
 
   ################################################################################
@@ -35,7 +35,8 @@ defmodule SensorSimulator.Messaging.SensorReadingConsumer do
   Initialize this process by requesting an AMQP channel from
   the AMQP Connection Manager
   """
-  def init(_) do
+  @impl true
+  def init(_init_arg) do
     AMQPConnectionManager.request_channel(__MODULE__)
     {:ok, nil}
   end
@@ -48,6 +49,7 @@ defmodule SensorSimulator.Messaging.SensorReadingConsumer do
 
     - channel: the AMQP channel allocated by the Connection Manager
   """
+  @impl true
   def handle_cast({:channel_available, channel}, _state) do
     :ok = SensorReadingQueue.register_consumer(channel)
     {:noreply, %{channel: channel}}
@@ -56,6 +58,7 @@ defmodule SensorSimulator.Messaging.SensorReadingConsumer do
   @doc """
   Receive confirmation from the broker that this process was registered as a consumer
   """
+  @impl true
   def handle_info({:basic_consume_ok, %{consumer_tag: consumer_tag}}, %{channel: channel}) do
     {:noreply, %{channel: channel, consumer_tag: consumer_tag}}
   end
@@ -63,6 +66,7 @@ defmodule SensorSimulator.Messaging.SensorReadingConsumer do
   @doc """
   Receive notification from the broker that this consumer was cancelled
   """
+  @impl true
   def handle_info({:basic_cancel, _}, state) do
     {:stop, :normal, state}
   end
@@ -70,6 +74,7 @@ defmodule SensorSimulator.Messaging.SensorReadingConsumer do
   @doc """
   Receive confirmation from the broker for a Basic.cancel
   """
+  @impl true
   def handle_info({:basic_cancel_ok, _}, state) do
     {:noreply, state}
   end
@@ -77,6 +82,7 @@ defmodule SensorSimulator.Messaging.SensorReadingConsumer do
   @doc """
   Receive notification from the broker that a message has been delivered
   """
+  @impl true
   def handle_info({:basic_deliver, payload, %{delivery_tag: tag, redelivered: redelivered}}, %{channel: channel, consumer_tag: consumer_tag} = state) do
     consume(channel, tag, redelivered, payload)
     {:noreply, state}

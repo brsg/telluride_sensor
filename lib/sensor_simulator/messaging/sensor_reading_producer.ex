@@ -9,8 +9,8 @@ defmodule SensorSimulator.Messaging.SensorEventProducer do
   # Client interface
   ################################################################################
 
-  def start_link(__opts \\ []) do
-    GenServer.start_link(__MODULE__, :ok, [name: __MODULE__])
+  def start_link(init_arg) do
+    GenServer.start_link(__MODULE__, init_arg, [name: __MODULE__])
   end
 
   def publish(message) when is_map(message) do
@@ -34,16 +34,19 @@ defmodule SensorSimulator.Messaging.SensorEventProducer do
   # GenServer callbacks
   ################################################################################
 
-  def init(_) do
+  @impl true
+  def init(_init_arg) do
     AMQPConnectionManager.request_channel(__MODULE__)
     {:ok, nil}
   end
 
+  @impl true
   def handle_cast({:channel_available, channel}, _state) do
     :ok = SensorReadingQueue.configure_producer(channel)
     {:noreply, channel}
   end
 
+  @impl true
   def handle_call({:publish, message, @routing_key}, _from, channel) do
     AMQP.Basic.publish(
       channel,                            #channel
