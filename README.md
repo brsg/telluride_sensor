@@ -51,7 +51,7 @@ SensorSimulator will also listen for incoming sensor health events on the `senso
 | sensor_events | direct | sensor.health | sensor_health_queue |
 
 #### RabbitMQ Consumer
-The module [SensorHealthProducer](lib/sensor_simulator/messaging/sensor_health_consumer.ex) is the consumer for sensor health events.
+The module [SensorHealthConsumer](lib/sensor_simulator/messaging/sensor_health_consumer.ex) is the consumer for sensor health events.
 
 #### Sensor Health Event Schema
 A sensor health event is expected to have the following structure:
