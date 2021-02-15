@@ -20,6 +20,7 @@ Any number of Sensor processes can be started, each of which is configured with:
 Each sensor will emit a sensor reading event message every 2 seconds.
 
 #### Sensor Reading Event Schema
+
 The structure of a sensor reading event is:
 ```
 {
@@ -34,26 +35,31 @@ The structure of a sensor reading event is:
 Sensor reading events are published to the `sensor_events` RabbitMQ exchange with a routing key of `sensor.reading`, which messages will be routed to the `sensor_reading_queue` queue.
 
 #### RabbitMQ Configuration
+
 | Exchange | Exchange Type | Routing Key | Queue |
 | -------- | ---- | ----------- | ----- |
 | sensor_events | direct | sensor.reading | sensor_readings_queue |
 
 #### RabbitMQ Producer
-The module [SensorReadingProducer](lib/sensor_simulator/messaging/sensor_reading_producer.ex) is responsiblef for publishding sensor reading events.
+
+The module [SensorReadingProducer](lib/sensor_simulator/messaging/sensor_reading_producer.ex) is responsible for publishing sensor reading events.
 
 ## Sensor Health Events
 
 SensorSimulator will also listen for incoming sensor health events on the `sensor_health_queue` in the `sensor_events` exchange.
 
 #### RabbitMQ Configuration
+
 | Exchange | Exchange Type | Routing Key | Queue |
 | -------- | ---- | ----------- | ----- |
 | sensor_events | direct | sensor.health | sensor_health_queue |
 
 #### RabbitMQ Consumer
-The module [SensorHealthConsumer](lib/sensor_simulator/messaging/sensor_health_consumer.ex) is the consumer for sensor health events.
+
+The module [SensorHealthConsumer](lib/sensor_simulator/messaging/sensor_health_consumer.ex) is responsible for consuming sensor health events.
 
 #### Sensor Health Event Schema
+
 A sensor health event is expected to have the following structure:
 
 ```
