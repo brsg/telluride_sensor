@@ -1,7 +1,10 @@
 # SensorSimulator
 
-SensorSimulator generates (using a normal / Gaussian distribution) and publishes a stream of
-simulated temperature sensor readings to a RabbitMQ queue `events`.
+SensorSimulator generates and publishes a stream of simulated temperature sensor reading events. Sensor readings are randomly generated, using a normal / Gaussian distribution, from `mean` and `variance` values that are supplied when a sensor is created.
+
+SensorSimulator also listens for an incoming stream of sensor health events. A sensor health event relates to a specific sensor and records the min, max and average sensor readings that have been seen as of particular point in time. The idea is that some process is listening for sensor reading events and is doing a streaming computation of the min, max and average reading for each sensor that is emitting readings.
+
+RabbitMQ is used to publish and consume sensor events.
 
 ## Sensors
 Any number of Sensor processes can be started, each of which is configured with: 
