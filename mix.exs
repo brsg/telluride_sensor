@@ -26,6 +26,7 @@ defmodule SensorSimulator.MixProject do
       {:dialyxir, "~> 1.0", only: [:dev], runtime: false},
       {:amqp, "~> 1.0" },
       {:json, "~> 1.2"},
+      { :uuid, "~> 1.1" },
       {:scenic, "~> 0.10"},
       {:scenic_driver_glfw, "~> 0.10", targets: :host},
       {:scenic_sensor, "~> 0.7"}
