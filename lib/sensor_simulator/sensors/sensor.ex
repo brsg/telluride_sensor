@@ -23,7 +23,7 @@ defmodule SensorSimulator.Sensors.Sensor do
     device_id = Keyword.get(sensor_config, :device_id)
     sensor_id = Keyword.get(sensor_config, :sensor_id)
     Scenic.Sensor.register(sensor_id, line_id, device_id)
-    Scenic.Sensor.publish(sensor_id, 0.0)
+    Scenic.Sensor.publish(sensor_id, Keyword.get(sensor_config, :mean))
 
     # emit a sensor reading after @emit_interval_ms
     schedule_emit_task(@emit_interval_ms)
