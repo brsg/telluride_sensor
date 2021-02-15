@@ -23,7 +23,7 @@ defmodule SensorSimulator.Scene.Dashboard do
   @alley_width 30
   @button_height 30
   @indent 15
-  @row_height @button_height
+  @row_height 60
   @col 3
   @num_sensor_types 3
 
@@ -103,7 +103,7 @@ defmodule SensorSimulator.Scene.Dashboard do
   defp add_pressure_device(mfg_line) do
     case LineConfig.add_pressure_device(mfg_line) do
       {:ok, %Device{} = next} ->
-        SensorSupervisor.start_sensor(next.sensor_type, mfg_line, next.device, Device.get_id(next), 75.0, 0.95)
+        SensorSupervisor.start_sensor(next.sensor_type, mfg_line, next.device, Device.get_id(next), random_mean(), random_variance())
         |> IO.inspect(label: "start_sensor pressure: ")
         Logger.info("New pressure device for line one, #{inspect next}.")
       {:max_devices, _} -> Logger.warn("Max devices reached for line one")
@@ -114,7 +114,7 @@ defmodule SensorSimulator.Scene.Dashboard do
   defp add_temperature_device(mfg_line) do
     case LineConfig.add_temperature_device(mfg_line) do
       {:ok, %Device{} = next} ->
-        SensorSupervisor.start_sensor(next.sensor_type, mfg_line, next.device, Device.get_id(next), 205.0, 0.25)
+        SensorSupervisor.start_sensor(next.sensor_type, mfg_line, next.device, Device.get_id(next), random_mean(), random_variance())
         |> IO.inspect(label: "start_sensor temperature: ")
         Logger.info("New temperature device for line one, #{inspect next}.")
       {:max_devices, _} -> Logger.warn("Max devices reached for line one")
@@ -125,7 +125,7 @@ defmodule SensorSimulator.Scene.Dashboard do
   defp add_viscosity_device(mfg_line) do
     case LineConfig.add_viscosity_device(mfg_line) do
       {:ok, %Device{} = next} ->
-        SensorSupervisor.start_sensor(next.sensor_type, mfg_line, next.device, Device.get_id(next), 905.0, 0.25)
+        SensorSupervisor.start_sensor(next.sensor_type, mfg_line, next.device, Device.get_id(next), random_mean(), random_variance())
         |> IO.inspect(label: "start_sensor viscosity: ")
         Logger.info("New viscosity device for line one, #{inspect next}.")
       {:max_devices, _} -> Logger.warn("Max devices reached for line one")
@@ -238,4 +238,13 @@ defmodule SensorSimulator.Scene.Dashboard do
       )
     end)
   end
+
+  defp random_mean() do
+    Enum.random(88..333) / 1
+  end
+
+  defp random_variance() do
+    Enum.random(1..13) / 1
+  end
+
 end
