@@ -112,14 +112,14 @@ defmodule SensorSimulator.Messaging.SensorHealthConsumer do
   defp consume(channel, delivery_tag, _redelivered, payload) do
     case JSON.decode(payload) do
       {:ok, event_info} ->
-        IO.puts("SensorHealthQueue.consume received #{inspect event_info}")
+        IO.puts("SensorHealthConsumer.consume - received #{inspect event_info}")
         AMQP.Basic.ack(channel, delivery_tag)
       {:error, reason} ->
         Basic.reject channel, delivery_tag, requeue: false
-        IO.puts("error '#{inspect reason}' processing payload: #{inspect payload}")
+        IO.puts("SensorHealthConsumer.consume - error '#{inspect reason}' processing payload: #{inspect payload}")
       err ->
         Basic.reject channel, delivery_tag, requeue: false
-        IO.puts("error '#{inspect err}'' processing payload: #{inspect payload}")
+        IO.puts("SensorHealthConsumer.consume - error '#{inspect err}'' processing payload: #{inspect payload}")
         err
     end
   end
