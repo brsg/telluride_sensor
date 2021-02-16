@@ -23,7 +23,7 @@ defmodule SensorSimulator.Scene.Dashboard do
   @alley_width 30
   @button_height 30
   @indent 15
-  @row_height 60
+  @row_height @button_height
   @col 3
   @num_sensor_types 3
 
