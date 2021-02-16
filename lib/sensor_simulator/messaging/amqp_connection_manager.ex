@@ -26,12 +26,8 @@ defmodule SensorSimulator.Messaging.AMQPConnectionManager do
   ################################################################################
 
   @impl
-  def init(_init_arg) do
-    children = [
-      {SensorSimulator.Messaging.SensorEventProducer, []},
-      {SensorSimulator.Messaging.SensorHealthConsumer, []},
-    ]
-    Supervisor.start_link(children, strategy: :one_for_one, name: SensorSimulator.Messaging.AMQPConsumerSupervisor)
+  def init(init_arg) do
+    Supervisor.start_link(init_arg, strategy: :one_for_one, name: SensorSimulator.Messaging.AMQPConsumerSupervisor)
     establish_new_connection()
   end
 

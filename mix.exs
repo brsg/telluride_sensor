@@ -14,8 +14,7 @@ defmodule SensorSimulator.MixProject do
 
   def application do
     [
-      # mod: {SensorSimulator.Application, []},
-      mod: {TellurideDevice, []},
+      mod: {SensorSimulator.Application, []},
       extra_applications: [:crypto, :logger]
     ]
   end
