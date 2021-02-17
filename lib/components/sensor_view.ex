@@ -135,8 +135,14 @@ defmodule SensorSimulator.Component.SensorView do
     delta_pct_mean = delta_delta / mean
     IO.inspect(delta_pct_mean, label: "\ndelta_pct_mean:\t")
 
-    :dead
+    sensor_state_assign(delta_pct_mean)
   end
+
+  defp sensor_state_assign(value) when value < 0.001, do: :healthy
+  defp sensor_state_assign(value) when value >= 0.001 when value < 0.01, do: :warn
+  defp sensor_state_assign(value) when value >= 0.01 when value < 0.1, do: :alert
+  defp sensor_state_assign(value) when value >= 0.1 when value < 1.0, do: :alarm
+  defp sensor_state_assign(value) when value >= 1.0 , do: :dead
 
   ## stroke colors: lime, yellow, orange, tomato
   defp stroke_color(opts) do
