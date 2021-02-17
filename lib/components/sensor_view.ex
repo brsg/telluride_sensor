@@ -61,7 +61,7 @@ defmodule SensorSimulator.Component.SensorView do
     IO.inspect(sensor_id, label: "subscribe to sensor_id: ")
     Sensor.subscribe(sensor_id)
 
-    {:ok, %{graph: graph, viewport: opts[:viewport]}, push: graph}
+    {:ok, %{graph: graph, viewport: opts[:viewport], opts: opts}, push: graph}
   end
 
   def handle_info({:sensor, :registered, {_sensor_id, _version, _description}} = data, graph) do
@@ -70,15 +70,28 @@ defmodule SensorSimulator.Component.SensorView do
   end
 
   def handle_info({:sensor, :data, {sensor_id, {:update, update_map}, _}} = data , graph_map) do
-    IO.inspect(sensor_id, label: "\nsensor_id:\t")
     IO.inspect(update_map, label: "\nupdate_map:\t")
     IO.inspect(data, label: "\nsensor_view.handle_info data:\t")
-    IO.inspect(graph_map, label: "\nsensor_view.handle_info graph_map:\t")
 
     mean_value = Float.round(update_map["mean"], 2)
-    update_string = ~s|mean #{mean_value}|
+    min_value = Float.round(update_map["min"])
+    max_value = Float.round(update_map["max"])
+    update_string = ~s|min: #{min_value}  #{mean_value} max: #{max_value}|
+    opts = graph_map[:opts]
+    width = opts[:styles][:width]
+    height = opts[:styles][:height]
+    sensor_state = compute_sensor_state(min_value, mean_value, max_value)
+    styles = Keyword.get(opts, :styles)
+    styles = Map.put(styles, :sensor_state, sensor_state)
+    opts = Keyword.put(opts, :styles, styles)
+    stroke_tuple = stroke_color(opts)
+    IO.inspect(opts, label: "\nupdate_in opts:\t")
+
 
     graph = Graph.modify(graph_map[:graph], update_id(sensor_id), &text(&1, update_string))
+    graph = Graph.modify(graph, rrect_id(sensor_id),
+      &rrect(&1, {width, height, @radius}, stroke: stroke_tuple)
+    )
     graph_map = Map.put(graph_map, :graph, graph)
 
     {:noreply, graph_map, push: graph}
@@ -91,17 +104,16 @@ defmodule SensorSimulator.Component.SensorView do
 
     # si_string = to_string(sensor_id)
     # [_line | [label]] = String.split(si_string, "::")
-    label = "R"
 
-    graph = Graph.modify(graph_map[:graph], sensor_id, &text(&1, ~s|#{label}: #{reading_rounded}|))
+    graph = Graph.modify(graph_map[:graph], sensor_id, &text(&1, ~s/::  #{reading_rounded}/))
     graph_map = Map.put(graph_map, :graph, graph)
 
     {:noreply, graph_map, push: graph}
   end
 
-
   def rrect_id(sensor_id), do: String.to_atom(to_string(sensor_id) <> @rrect_id_suffix)
   def update_id(sensor_id), do: String.to_atom(to_string(sensor_id) <> @update_id_suffix)
+
   ## Private / Helping
   defp fill_color(opts) do
     # IO.inspect(opts, label: "fill_color opts: ")
@@ -113,15 +125,28 @@ defmodule SensorSimulator.Component.SensorView do
     end
   end
 
+  defp compute_sensor_state(min, mean, max) do
+    min_mean_delta = mean - min
+    IO.inspect(min_mean_delta, label: "\nmin_mean_delta:\t")
+    max_mean_delta = max - mean
+    IO.inspect(max_mean_delta, label: "\nmax_mean_delta:\t")
+    delta_delta = abs(max_mean_delta - min_mean_delta)
+    IO.inspect(delta_delta, label: "\ndelta_delta:\t")
+    delta_pct_mean = delta_delta / mean
+    IO.inspect(delta_pct_mean, label: "\ndelta_pct_mean:\t")
+
+    :dead
+  end
+
   ## stroke colors: lime, yellow, orange, tomato
   defp stroke_color(opts) do
     # IO.inspect(opts, label: "stroke_color opts: ")
     case opts[:styles][:sensor_state] do
       :healthy -> {3, :lime}
-      :warn -> {3, :yellow}
-      :alert -> {3, :orange}
-      :alarm -> {3, :tomato}
-      :dead -> {3, :black}
+      :warn -> {4, :yellow}
+      :alert -> {4, :orange}
+      :alarm -> {5, :tomato}
+      :dead -> {5, :black}
       _ -> {3, :brown}      ## unrecognized state
     end
   end
