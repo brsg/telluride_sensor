@@ -58,7 +58,7 @@ defmodule SensorSimulator.Component.SensorView do
       # |> rrect({width, height, 10}, theme: :primary )
       # |> text(initial_reading, id: text_id, font_size: @font_size, t: {@indent, @font_size * 2})
 
-    IO.inspect(sensor_id, label: "subscribe to sensor_id: ")
+    # IO.inspect(sensor_id, label: "subscribe to sensor_id: ")
     Sensor.subscribe(sensor_id)
 
     {:ok, %{graph: graph, viewport: opts[:viewport], opts: opts}, push: graph}
@@ -70,8 +70,6 @@ defmodule SensorSimulator.Component.SensorView do
   end
 
   def handle_info({:sensor, :data, {sensor_id, {:update, update_map}, _}} = data , graph_map) do
-    IO.inspect(update_map, label: "\nupdate_map:\t")
-    IO.inspect(data, label: "\nsensor_view.handle_info data:\t")
 
     mean_value = Float.round(update_map["mean"], 2)
     min_value = Float.round(update_map["min"])
@@ -84,9 +82,8 @@ defmodule SensorSimulator.Component.SensorView do
     styles = Keyword.get(opts, :styles)
     styles = Map.put(styles, :sensor_state, sensor_state)
     opts = Keyword.put(opts, :styles, styles)
+    graph_map = Map.put(graph_map, :opts, opts)
     stroke_tuple = stroke_color(opts)
-    IO.inspect(opts, label: "\nupdate_in opts:\t")
-
 
     graph = Graph.modify(graph_map[:graph], update_id(sensor_id), &text(&1, update_string))
     graph = Graph.modify(graph, rrect_id(sensor_id),
@@ -127,13 +124,10 @@ defmodule SensorSimulator.Component.SensorView do
 
   defp compute_sensor_state(min, mean, max) do
     min_mean_delta = mean - min
-    IO.inspect(min_mean_delta, label: "\nmin_mean_delta:\t")
     max_mean_delta = max - mean
-    IO.inspect(max_mean_delta, label: "\nmax_mean_delta:\t")
     delta_delta = abs(max_mean_delta - min_mean_delta)
-    IO.inspect(delta_delta, label: "\ndelta_delta:\t")
     delta_pct_mean = delta_delta / mean
-    IO.inspect(delta_pct_mean, label: "\ndelta_pct_mean:\t")
+    # IO.inspect(delta_pct_mean, label: "\ndelta_pct_mean:\t")
 
     sensor_state_assign(delta_pct_mean)
   end
