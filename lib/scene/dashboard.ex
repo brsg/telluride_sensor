@@ -27,58 +27,69 @@ defmodule SensorSimulator.Scene.Dashboard do
   @col 3
   @num_sensor_types 3
 
-  def init(_data, opts) do
+  def init(_data, _opts) do
     # IO.inspect(opts, label: "opts: ")
 
     Scenic.Cache.Static.Texture.load(@telluride_image, @telluride_hash)
+      graph =
+        Graph.build(font: :roboto, font_size: 16, theme: :light)
+        |> rect(
+          {171, 90}, id: :telluride_image, fill: {:image, {@telluride_hash, 255}},
+          t: {0, 0}
+        )
+        |> text(@title, font_size: 36, fill: :dark_blue, font_blur: 3, t: {193, 38})
+        |> text(@title, font_size: 36, fill: :dark_blue, t: {190, 35})
+        |> text(@sub_title, font_size: 28, fill: :dark_blue, t: {190, 66})
+        |> build_column(0, LineConfig.fetch_device_list(:line_one))
+        |> build_column(1, LineConfig.fetch_device_list(:line_two))
+        |> build_column(2, LineConfig.fetch_device_list(:line_three))
 
-    graph = build_graph()
     {:ok, graph, push: graph}
   end
 
-  def filter_event({:click, "add_pressure_0"} = event, _, _graph) do
+  def filter_event({:click, "add_pressure_0"} = event, _, graph) do
     add_pressure_device(:line_one)
-    build_and_push_graph(event)
+    build_and_push_graph(event, graph)
   end
 
-  def filter_event({:click, "add_pressure_1"} = event, _, _graph) do
+  def filter_event({:click, "add_pressure_1"} = event, _, graph) do
     add_pressure_device(:line_two)
-    build_and_push_graph(event)
+    build_and_push_graph(event, graph)
   end
 
-  def filter_event({:click, "add_pressure_2"} = event, _, _graph) do
+  def filter_event({:click, "add_pressure_2"} = event, _, graph) do
     add_pressure_device(:line_three)
-    build_and_push_graph(event)
+    build_and_push_graph(event, graph)
   end
 
-  def filter_event({:click, "add_temperature_0"} = event, _, _graph) do
+  def filter_event({:click, "add_temperature_0"} = event, _, graph) do
     add_temperature_device(:line_one)
-    build_and_push_graph(event)
+    build_and_push_graph(event, graph)
   end
 
-  def filter_event({:click, "add_temperature_1"} = event, _, _graph) do
+  def filter_event({:click, "add_temperature_1"} = event, _, graph) do
     add_temperature_device(:line_two)
-    build_and_push_graph(event)
+    build_and_push_graph(event, graph)
   end
 
-  def filter_event({:click, "add_temperature_2"} = event, _, _graph) do
+  def filter_event({:click, "add_temperature_2"} = event, _, graph) do
     add_temperature_device(:line_three)
-    build_and_push_graph(event)
+    build_and_push_graph(event, graph)
   end
 
-  def filter_event({:click, "add_viscosity_0"} = event, _, _graph) do
+  def filter_event({:click, "add_viscosity_0"} = event, _, graph) do
     add_viscosity_device(:line_one)
-    build_and_push_graph(event)
+    build_and_push_graph(event, graph)
   end
 
-  def filter_event({:click, "add_viscosity_1"} = event, _, _graph) do
+  def filter_event({:click, "add_viscosity_1"} = event, _, graph) do
     add_viscosity_device(:line_two)
-    build_and_push_graph(event)
+    build_and_push_graph(event, graph)
   end
 
-  def filter_event({:click, "add_viscosity_2"} = event, _, _graph) do
+  def filter_event({:click, "add_viscosity_2"} = event, _, graph) do
     add_viscosity_device(:line_three)
-    build_and_push_graph(event)
+    build_and_push_graph(event, graph)
   end
 
   def handle_info({:sensor, :registered, {_sensor_id, _version, _description}} = data, graph) do
@@ -86,7 +97,7 @@ defmodule SensorSimulator.Scene.Dashboard do
     {:noreply, graph, push: graph}
   end
 
-  def handle_info({:sensor, :data, {sensor_id, reading, _}} = data, graph) do
+  def handle_info({:sensor, :data, {_sensor_id, _reading, _}} = data, graph) do
     IO.inspect(data, label: "dashboard handle_info data: ")
     # reading_rounded =
       # reading
@@ -95,9 +106,23 @@ defmodule SensorSimulator.Scene.Dashboard do
     {:noreply, graph, push: graph}
   end
 
-  defp build_and_push_graph(event) do
-    graph = build_graph()
-    {:cont, event, graph, push: graph}
+  defp build_and_push_graph(event, graph) do
+    graph_temp =
+      graph
+      |> Graph.reduce(
+        graph, fn primitive, accum_graph ->
+          primitive_id = Map.get(primitive, :id)
+          if (String.contains?(to_string(primitive_id), "col_")) do
+            Graph.delete(accum_graph, primitive_id)
+          else
+            accum_graph
+          end
+      end)
+      |> build_column(0, LineConfig.fetch_device_list(:line_one))
+      |> build_column(1, LineConfig.fetch_device_list(:line_two))
+      |> build_column(2, LineConfig.fetch_device_list(:line_three))
+
+    {:cont, event, graph_temp, push: graph_temp}
   end
 
   defp add_pressure_device(mfg_line) do
@@ -158,22 +183,11 @@ defmodule SensorSimulator.Scene.Dashboard do
     Float.round(col_width / @num_sensor_types - @indent / @num_sensor_types, 2)
   end
 
-  defp build_graph() do
-      Graph.build(font: :roboto, font_size: 16, theme: :light)
-      |> rect(
-        {171, 90}, id: :telluride_image, fill: {:image, {@telluride_hash, 255}},
-        t: {0, 0}
-      )
-      |> text(@title, font_size: 36, fill: :dark_blue, font_blur: 3, t: {193, 38})
-      |> text(@title, font_size: 36, fill: :dark_blue, t: {190, 35})
-      |> text(@sub_title, font_size: 28, fill: :dark_blue, t: {190, 66})
-      |> build_column(0, LineConfig.fetch_device_list(:line_one))
-      |> build_column(1, LineConfig.fetch_device_list(:line_two))
-      |> build_column(2, LineConfig.fetch_device_list(:line_three))
-
-  end
+  # defp build_graph() do
+  # end
 
   defp build_column(graph, col_num, device_list) do
+    col_id = ~s|col_#{col_num}|
     column_label = ~s|Mfg. Line #{inspect col_num + 1}|
     x_offset = col_num * column_width()
     alley = alley_value(col_num)
@@ -206,6 +220,7 @@ defmodule SensorSimulator.Scene.Dashboard do
           )
           |> build_sensors(device_list)
         end,
+        id: col_id,
         t: {x_offset + alley, @header_height}
       )
   end
