@@ -41,7 +41,10 @@ defmodule SensorSimulator.Data.LineConfig do
   end
 
   def handle_call({:find, line_key}, _, config_map) do
-    device_list = Map.get(config_map, line_key)
+    device_list =
+      Map.get(config_map, line_key)
+      |> Enum.sort_by(&(&1.device))
+      # |> Enum.sort(fn %Device{} = device -> asc(device.device) end)
     {:reply, device_list, config_map}
   end
 
@@ -67,9 +70,15 @@ defmodule SensorSimulator.Data.LineConfig do
   end
 
   defp compose_next_device(line_id, device_list, sensor_type) do
-    count = to_string(Enum.count(device_list) + 1)
+    count = Enum.count(device_list) + 1
     line = to_string(line_id)
-    device = ~s|#{line}_device_#{count}|
+    device =
+      case count < 10 do
+        true ->
+          ~s|#{line}_device_0#{count}|
+        false ->
+          ~s|#{line}_device_#{count}|
+      end
     device_map = %{mfg_line: line_id, device: device, sensor_type: sensor_type}
     Device.new(device_map)
   end
