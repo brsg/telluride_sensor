@@ -85,20 +85,13 @@ defmodule SensorSimulator.Messaging.SensorHealthConsumer do
   @impl true
   def handle_info({:basic_deliver, payload, %{delivery_tag: tag, redelivered: redelivered}}, %{channel: channel, consumer_tag: _consumer_tag} = state) do
 
-    IO.inspect(payload, label: "\npayload\t")
     payload_map = JSON.decode!(payload)
-    IO.inspect(payload_map, label: "\npayload_map:\t")
     Map.get(payload_map, "sensor_id")
-    |> IO.inspect(label: "\nsensor_id\t")
     |> String.to_atom()
-    |> IO.inspect(label: "\nexisting_atom:\t")
     |> fetch_sensor_pid()
-    |> IO.inspect(label: "\nPID LIST:\t")
     |> Enum.each(fn {_sensor_id, _line_id, _device_id, pid} ->
       send(pid, {:rmq_update, payload_map})
     end)
-    # |> Scenic.Sensor.publish(Map.get(payload_map, "mean"))
-    # |> IO.inspect(label: "\npublished:\t")
 
     consume(channel, tag, redelivered, payload)
     {:noreply, state}
@@ -124,11 +117,9 @@ defmodule SensorSimulator.Messaging.SensorHealthConsumer do
 
   defp fetch_sensor_pid(s_id) do
     Scenic.Sensor.list()
-    |> IO.inspect(label: "\nRegistered Sencors:\t")
     |> Enum.filter(fn {sensor_id, _line_id, _device_id, _pid} ->
       sensor_id == s_id
     end)
-    |> IO.inspect(label: "\nFILTERED:\t")
   end
 
   @doc """
@@ -136,8 +127,8 @@ defmodule SensorSimulator.Messaging.SensorHealthConsumer do
   """
   defp consume(channel, delivery_tag, _redelivered, payload) do
     case JSON.decode(payload) do
-      {:ok, event_info} ->
-        IO.puts("SensorHealthConsumer.consume - received #{inspect event_info}")
+      {:ok, _event_info} ->
+        # IO.puts("SensorHealthConsumer.consume - received #{inspect event_info}")
         AMQP.Basic.ack(channel, delivery_tag)
       {:error, reason} ->
         Basic.reject channel, delivery_tag, requeue: false
