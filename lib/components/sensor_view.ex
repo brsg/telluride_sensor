@@ -6,10 +6,11 @@ defmodule SensorSimulator.Component.SensorView do
 
   import Scenic.Primitives    #, only: [{:text, 3}, {:rect, 3}]
 
-  @font_size 20
+  @font_size 14
   @radius 10
   @button_height 35
-
+  @rrect_id_suffix "_rrect"
+  @update_id_suffix "_update"
 
   def verify(reading) when is_bitstring(reading), do: {:ok, reading}
   def verify(_), do: :invalid_data
@@ -18,19 +19,23 @@ defmodule SensorSimulator.Component.SensorView do
     IO.inspect(opts, label: "sensor_view init opts: ")
     width = opts[:styles][:width]
     height = opts[:styles][:height]
-    device_id = opts[:styles][:device_id]
-    sensor_type = opts[:styles][:sensor_type]
+    # device_id = opts[:styles][:device_id]
+    # sensor_type = opts[:styles][:sensor_type]
     radius = opts[:styles][:radius] || @radius
     fill_color_tuple = fill_color(opts)
     stroke_tuple = stroke_color(opts)
     sensor_id = opts[:id]
     text_id = sensor_id
+    update_text_id = update_id(sensor_id)
+    rrect_id = rrect_id(sensor_id)
 
-    initial_reading =
+    reading_text =
       case reading == "" do
-        true -> ~s|#{device_id}: off line|
-        false -> ~s|#{device_id}: #{reading}|
+        true -> ~s|off line|
+        false -> ~s|#{reading}|
       end
+
+    update_text = ""
 
     graph =
       Graph.build(font_size: @font_size, t: {0, @button_height})
@@ -38,11 +43,15 @@ defmodule SensorSimulator.Component.SensorView do
         fn g ->
           g
           |> rrect(
-            {width, height, radius}, stroke: stroke_tuple, fill: fill_color_tuple
+            {width, height, radius}, id: rrect_id, stroke: stroke_tuple, fill: fill_color_tuple
           )
           |> text(
-            initial_reading, id: text_id, font_size: @font_size,
-            fill: :white, t: {width * 0.05, height * 0.75}
+            update_text, id: update_text_id, font_size: @font_size,
+            fill: :white, t: {width * 0.05, height * 0.60}
+          )
+          |> text(
+            reading_text, id: text_id, font_size: @font_size,
+            fill: :white, t: {width * 0.80, height * 0.60}
           )
         end
       )
@@ -60,13 +69,29 @@ defmodule SensorSimulator.Component.SensorView do
     {:noreply, graph, push: graph}
   end
 
-  def handle_info({:sensor, :data, {sensor_id, reading, _}} = data, graph_map) do
+  def handle_info({:sensor, :data, {sensor_id, {:update, update_map}, _}} = data , graph_map) do
+    IO.inspect(sensor_id, label: "\nsensor_id:\t")
+    IO.inspect(update_map, label: "\nupdate_map:\t")
+    IO.inspect(data, label: "\nsensor_view.handle_info data:\t")
+    IO.inspect(graph_map, label: "\nsensor_view.handle_info graph_map:\t")
+
+    mean_value = Float.round(update_map["mean"], 2)
+    update_string = ~s|mean #{mean_value}|
+
+    graph = Graph.modify(graph_map[:graph], update_id(sensor_id), &text(&1, update_string))
+    graph_map = Map.put(graph_map, :graph, graph)
+
+    {:noreply, graph_map, push: graph}
+  end
+
+  def handle_info({:sensor, :data, {sensor_id, reading, _}} = _data, graph_map) do
     reading_rounded =
       reading
       |> :erlang.float_to_binary(decimals: 2)
 
-    si_string = to_string(sensor_id)
-    [_line | [label]] = String.split(si_string, "::")
+    # si_string = to_string(sensor_id)
+    # [_line | [label]] = String.split(si_string, "::")
+    label = "R"
 
     graph = Graph.modify(graph_map[:graph], sensor_id, &text(&1, ~s|#{label}: #{reading_rounded}|))
     graph_map = Map.put(graph_map, :graph, graph)
@@ -74,6 +99,9 @@ defmodule SensorSimulator.Component.SensorView do
     {:noreply, graph_map, push: graph}
   end
 
+
+  def rrect_id(sensor_id), do: String.to_atom(to_string(sensor_id) <> @rrect_id_suffix)
+  def update_id(sensor_id), do: String.to_atom(to_string(sensor_id) <> @update_id_suffix)
   ## Private / Helping
   defp fill_color(opts) do
     # IO.inspect(opts, label: "fill_color opts: ")

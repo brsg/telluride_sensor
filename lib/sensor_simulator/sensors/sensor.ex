@@ -23,6 +23,7 @@ defmodule SensorSimulator.Sensors.Sensor do
     device_id = Keyword.get(sensor_config, :device_id)
     sensor_id = Keyword.get(sensor_config, :sensor_id)
     Scenic.Sensor.register(sensor_id, line_id, device_id)
+    IO.inspect(sensor_id, label: "\nSENSOR_ID Registered:\t")
     Scenic.Sensor.publish(sensor_id, Keyword.get(sensor_config, :mean))
 
     # emit a sensor reading after @emit_interval_ms
@@ -46,6 +47,15 @@ defmodule SensorSimulator.Sensors.Sensor do
     schedule_emit_task(@emit_interval_ms)
 
     {:noreply, %{config: sensor_config}}
+  end
+
+  def handle_info({:rmq_update, %{} = update_map}, %{config: sensor_config} = config_map) do
+    IO.inspect(update_map, label: "\nA:\t")
+    IO.inspect(sensor_config, label: "\nB:\t")
+
+    Scenic.Sensor.publish(sensor_config[:sensor_id], {:update, update_map})
+
+    {:noreply, config_map}
   end
 
   ################################################################################
