@@ -132,11 +132,11 @@ defmodule SensorSimulator.Component.SensorView do
     sensor_state_assign(delta_pct_mean)
   end
 
-  defp sensor_state_assign(value) when value < 0.001, do: :healthy
-  defp sensor_state_assign(value) when value >= 0.001 when value < 0.01, do: :warn
-  defp sensor_state_assign(value) when value >= 0.01 when value < 0.1, do: :alert
-  defp sensor_state_assign(value) when value >= 0.1 when value < 1.0, do: :alarm
-  defp sensor_state_assign(value) when value >= 1.0 , do: :dead
+  defp sensor_state_assign(value) when value < 0.01, do: :healthy
+  defp sensor_state_assign(value) when value >= 0.01 when value < 0.05, do: :warn
+  defp sensor_state_assign(value) when value >= 0.05 when value < 0.09, do: :alert
+  defp sensor_state_assign(value) when value >= 0.09 when value < 0.5, do: :alarm
+  defp sensor_state_assign(value) when value >= 0.5 , do: :dead
 
   ## stroke colors: lime, yellow, orange, tomato
   defp stroke_color(opts) do
