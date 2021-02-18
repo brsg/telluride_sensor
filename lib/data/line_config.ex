@@ -1,7 +1,7 @@
-defmodule SensorSimulator.Data.LineConfig do
+defmodule TellurideSensor.Data.LineConfig do
   use GenServer
 
-  alias SensorSimulator.Data.Device
+  alias TellurideSensor.Data.Device
 
   @max_devices 12
 

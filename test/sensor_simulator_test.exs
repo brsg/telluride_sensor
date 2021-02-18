@@ -1,8 +1,8 @@
-defmodule SensorSimulatorTest do
+defmodule TellurideSensorTest do
   use ExUnit.Case
-  doctest SensorSimulator
+  doctest TellurideSensor
 
   test "greets the world" do
-    assert SensorSimulator.hello() == :world
+    assert TellurideSensor.hello() == :world
   end
 end

@@ -1,9 +1,9 @@
-defmodule SensorSimulator.Messaging.SensorHealthConsumer do
+defmodule TellurideSensor.Messaging.SensorHealthConsumer do
   use GenServer
   use AMQP
 
-  alias SensorSimulator.Messaging.AMQPConnectionManager
-  alias SensorSimulator.Messaging.SensorHealthQueue
+  alias TellurideSensor.Messaging.AMQPConnectionManager
+  alias TellurideSensor.Messaging.SensorHealthQueue
 
   ################################################################################
   # Client interface

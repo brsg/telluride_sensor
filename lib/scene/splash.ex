@@ -1,4 +1,4 @@
-defmodule SensorSimulator.Scene.Splash do
+defmodule TellurideSensor.Scene.Splash do
   @moduledoc """
   BRSG Ideas That Scale splash page, transition to landing page.
   """
@@ -8,7 +8,7 @@ defmodule SensorSimulator.Scene.Splash do
   alias Scenic.ViewPort
   import Scenic.Primitives, only: [{:rect, 3}, {:update_opts, 2}]
 
-  @brsg_path :code.priv_dir(:sensor_simulator)
+  @brsg_path :code.priv_dir(:telluride_sensor)
     |> Path.join("/static/images/ideas_that_scale_600_by_173.png")
   @brsg_hash Scenic.Cache.Support.Hash.file!(@brsg_path, :sha)
 

@@ -1,7 +1,7 @@
-defmodule SensorSimulator.Sensors.SensorSupervisor do
+defmodule TellurideSensor.Sensors.SensorSupervisor do
   use DynamicSupervisor
 
-  alias SensorSimulator.Sensors.Sensor
+  alias TellurideSensor.Sensors.Sensor
 
   ################################################################################
   # Client interface

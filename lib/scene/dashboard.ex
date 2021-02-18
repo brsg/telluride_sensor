@@ -1,4 +1,4 @@
-defmodule SensorSimulator.Scene.Dashboard do
+defmodule TellurideSensor.Scene.Dashboard do
   use Scenic.Scene
 
   require Logger
@@ -9,12 +9,12 @@ defmodule SensorSimulator.Scene.Dashboard do
   import Scenic.Components
   alias Scenic.Sensor
 
-  alias SensorSimulator.Component.SensorView
-  alias SensorSimulator.Data.LineConfig
-  alias SensorSimulator.Data.Device
-  alias SensorSimulator.Sensors.SensorSupervisor
+  alias TellurideSensor.Component.SensorView
+  alias TellurideSensor.Data.LineConfig
+  alias TellurideSensor.Data.Device
+  alias TellurideSensor.Sensors.SensorSupervisor
 
-  @telluride_image :code.priv_dir(:sensor_simulator)
+  @telluride_image :code.priv_dir(:telluride_sensor)
     |> Path.join("/static/images/brsgMtnOnlyThin-Clear_telluride_171_by_90.png")
   @telluride_hash Scenic.Cache.Support.Hash.file!(@telluride_image, :sha)
   @title "A Polyglot Demo of Pure Elixir"
@@ -159,7 +159,7 @@ defmodule SensorSimulator.Scene.Dashboard do
   end
 
   defp viewport_dimensions() do
-      viewport = Application.fetch_env!(:sensor_simulator, :viewport)
+      viewport = Application.fetch_env!(:telluride_sensor, :viewport)
       # IO.inspect(viewport, label: "viewport: ")
       Map.get(viewport, :size)
   end

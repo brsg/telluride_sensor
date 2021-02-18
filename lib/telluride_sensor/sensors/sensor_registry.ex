@@ -1,4 +1,4 @@
-defmodule SensorSimulator.Sensors.SensorRegistry do
+defmodule TellurideSensor.Sensors.SensorRegistry do
 
   def start_link do
     Registry.start_link(keys: :unique, name: __MODULE__)

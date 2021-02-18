@@ -1,4 +1,4 @@
-defmodule SensorSimulator.Messaging.SensorHealthQueue do
+defmodule TellurideSensor.Messaging.SensorHealthQueue do
 
   @exchange         "sensor_events"
 

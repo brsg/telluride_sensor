@@ -3,10 +3,10 @@
 use Mix.Config
 
 # Configure the main viewport for the Scenic application
-config :sensor_simulator, :viewport, %{
+config :telluride_sensor, :viewport, %{
   name: :main_viewport,
   size: {800, 600},
-  default_scene: {SensorSimulator.Scene.Splash, SensorSimulator.Scene.Dashboard},
+  default_scene: {TellurideSensor.Scene.Splash, TellurideSensor.Scene.Dashboard},
   drivers: [
     %{
       module: Scenic.Driver.Glfw,
@@ -15,11 +15,3 @@ config :sensor_simulator, :viewport, %{
     }
   ]
 }
-
-# It is also possible to import configuration files, relative to this
-# directory. For example, you can emulate configuration per environment
-# by uncommenting the line below and defining dev.exs, test.exs and such.
-# Configuration from the imported file will override the ones defined
-# here (which is why it is important to import them last).
-#
-#     import_config "prod.exs"

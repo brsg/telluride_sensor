@@ -1,8 +1,8 @@
-defmodule SensorSimulator.Sensors.Sensor do
+defmodule TellurideSensor.Sensors.Sensor do
   use GenServer, restart: :temporary
 
-  alias SensorSimulator.Messaging.SensorEventProducer
-  alias SensorSimulator.Sensors.SensorRegistry
+  alias TellurideSensor.Messaging.SensorEventProducer
+  alias TellurideSensor.Sensors.SensorRegistry
 
   @emit_interval_ms 2_000
 

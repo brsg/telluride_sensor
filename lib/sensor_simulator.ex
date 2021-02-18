@@ -1,2 +1,0 @@
-defmodule SensorSimulator do
-end

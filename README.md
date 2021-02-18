@@ -1,10 +1,16 @@
-# SensorSimulator
+# TellurideSensor
 
-SensorSimulator generates and publishes a stream of simulated IoT sensor reading events. Sensor readings are randomly generated, using a normal / Gaussian distribution, from `mean` and `variance` values that are supplied when a sensor is created.
+TellurideSensor generates and publishes a stream of simulated IoT sensor reading events.
 
-SensorSimulator also listens for an incoming stream of sensor health events. A sensor health event relates to a specific sensor and records the min, max and average sensor readings that have been seen as of particular point in time. The idea is that some process is listening for sensor reading events and is doing a streaming computation of the min, max and average reading for each sensor that is emitting readings.
+The objective of this project is to generate a volume-configuable stream of data for testing and simulation. The realism and fidelity of the generated data to actual IoT sensor reading was really not a primary concern, and the generated data is admittedly contrived.
+
+Sensor readings are randomly generated, using a normal / Gaussian distribution, from `mean` and `variance` values that are supplied when a sensor is created.
+
+TellurideSensor also listens for an incoming stream of sensor health events. A sensor health event relates to a specific sensor and records the min, max and average sensor readings that have been seen as of particular point in time. The idea is that some process might be listening for sensor reading events and computing, and then feeding back, some "analytics" about the sensors - in this case the expectation is some simple aggregate analytics for a sensor (min, max and average sensor reading).
 
 RabbitMQ is used to publish and consume sensor events.
+
+To run TellurideSensor, see the [Getting Started](#getting-started) section below.
 
 ## Sensors
 Any number of Sensor processes can be started, each of which is configured with: 
@@ -46,7 +52,7 @@ The module [SensorReadingProducer](lib/sensor_simulator/messaging/sensor_reading
 
 ## Sensor Health Events
 
-SensorSimulator will also listen for incoming sensor health events on the `sensor_health_queue` in the `sensor_events` exchange.
+TellurideSensor will also listen for incoming sensor health events on the `sensor_health_queue` in the `sensor_events` exchange.
 
 #### RabbitMQ Configuration
 
@@ -71,3 +77,16 @@ A sensor health event is expected to have the following structure:
   "total_reads" : 41
 }
 ```
+
+## <a name="getting-started"></a> Getting Started
+
+1. Start RabbitMQ
+
+    $ cd telluride_sensor
+    $ bin/rmq-up.sh   (or docker-compose up [-d])
+
+2. Start the TellurideSensor application
+
+    $ cd telluride_sensor
+    $ iex -S mix
+

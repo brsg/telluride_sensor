@@ -1,0 +1,2 @@
+defmodule TellurideSensor do
+end

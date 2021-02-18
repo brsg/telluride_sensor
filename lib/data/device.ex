@@ -1,4 +1,4 @@
-defmodule SensorSimulator.Data.Device do
+defmodule TellurideSensor.Data.Device do
   @moduledoc """
   The module associated with the struct that defines devices to be
   monitored.

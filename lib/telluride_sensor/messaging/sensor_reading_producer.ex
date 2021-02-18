@@ -1,9 +1,9 @@
-defmodule SensorSimulator.Messaging.SensorEventProducer do
+defmodule TellurideSensor.Messaging.SensorEventProducer do
   use GenServer
 
   alias __MODULE__
-  alias SensorSimulator.Messaging.AMQPConnectionManager
-  alias SensorSimulator.Messaging.SensorReadingQueue
+  alias TellurideSensor.Messaging.AMQPConnectionManager
+  alias TellurideSensor.Messaging.SensorReadingQueue
 
   ################################################################################
   # Client interface
