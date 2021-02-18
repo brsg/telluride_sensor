@@ -1,2 +1,2 @@
 #!/bin/bash
-docker-compose -f rmq.yaml up
+docker-compose up

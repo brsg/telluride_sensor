@@ -1,2 +1,2 @@
 #!/bin/bash
-docker-compose -f rmq.yaml down
+docker-compose down
