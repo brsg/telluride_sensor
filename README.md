@@ -1,8 +1,10 @@
 # TellurideSensor
 
-TellurideSensor generates and publishes a stream of simulated IoT sensor reading events.
+TellurideSensor collaborates with [TelluridePipelime](https://github.com/brsg/telluride_pipeline) and [TellurideUI](https://github.com/brsg/telluride_ui) to provide an example of a [Broadway](https://github.com/dashbitco/broadway) pipeline consuming a stream of simulated IoT sensor reading messages from a `RabbitMQ` queue, in batches, computing some simple aggregate metrics over the stream of messages, and then publishlishing those metrics in a batch-oriented way to a queue on `RabbitMQ` by way of the [BroadwayRabbitMQ](https://github.com/dashbitco/broadway_rabbitmq) producer.  The point of this example is not the domain, which is contrived, but the mechanics of `Broadway` and Rabbit MQ working together.
 
-The objective of this project is to generate a volume-configuable stream of data for testing and simulation. The realism and fidelity of the generated data to actual IoT sensor reading was really not a primary concern, and the generated data is admittedly contrived.
+The TellurideSensor application generates and publishes a stream of simulated IoT sensor reading events.
+
+The objective of TellurideSensor is to generate a volume-configuable stream of data for testing and simulation. The realism and fidelity of the generated data to actual IoT sensor reading was really not a primary concern, and the generated data is admittedly contrived.
 
 Sensor readings are randomly generated, using a normal / Gaussian distribution, from `mean` and `variance` values that are supplied when a sensor is created.
 
@@ -13,6 +15,7 @@ RabbitMQ is used to publish and consume sensor events.
 To run TellurideSensor, see the [Getting Started](#getting-started) section below.
 
 ## Sensors
+
 Any number of Sensor processes can be started, each of which is configured with: 
 * sensor_type - an atom such as :temperature, :viscosity, :pressure, :proximity, :turbidity, :level
 * line_id - the id of the hypthetical manufacturing line on which the sensor is deployed
@@ -48,7 +51,7 @@ Sensor reading events are published to the `sensor_events` RabbitMQ exchange wit
 
 #### RabbitMQ Producer
 
-The module [SensorReadingProducer](lib/sensor_simulator/messaging/sensor_reading_producer.ex) is responsible for publishing sensor reading events.
+The module [SensorReadingProducer](lib/telluride_sensor/messaging/sensor_reading_producer.ex) is responsible for publishing sensor reading events.
 
 ## Sensor Health Events
 
@@ -62,7 +65,7 @@ TellurideSensor will also listen for incoming sensor health events on the `senso
 
 #### RabbitMQ Consumer
 
-The module [SensorHealthConsumer](lib/sensor_simulator/messaging/sensor_health_consumer.ex) is responsible for consuming sensor health events.
+The module [SensorHealthConsumer](lib/telluride_sensor/messaging/sensor_health_consumer.ex) is responsible for consuming sensor health events.
 
 #### Sensor Health Event Schema
 
