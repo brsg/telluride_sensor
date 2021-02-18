@@ -84,12 +84,16 @@ A sensor health event is expected to have the following structure:
 ## <a name="getting-started"></a> Getting Started
 
 1. Start RabbitMQ
-
+```
     $ cd telluride_sensor
+
     $ bin/rmq-up.sh   (or docker-compose up [-d])
+```
 
 2. Start the TellurideSensor application
-
+```
     $ cd telluride_sensor
+
     $ iex -S mix
+```
 
