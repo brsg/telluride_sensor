@@ -4,9 +4,9 @@ TellurideSensor collaborates with [TelluridePipelime](https://github.com/brsg/te
 
 The TellurideSensor application generates and publishes a stream of simulated IoT sensor reading events.
 
-The objective of TellurideSensor is to generate a volume-configuable stream of data for testing and simulation. The realism and fidelity of the generated data to actual IoT sensor reading was really not a primary concern, and the generated data is admittedly contrived.
+A [Scenic](https://github.com/boydm/scenic)-based UI is also provided that supports configuration and visualization of the "sensor network" that is emitting simulated IoT sensor reading messages.
 
-Sensor readings are randomly generated, using a normal / Gaussian distribution, from `mean` and `variance` values that are supplied when a sensor is created.
+The objective of TellurideSensor is to generate a volume-configuable stream of data for testing and simulation. The realism and fidelity of the generated data to actual IoT sensor reading was really not a primary concern, and the generated data is admittedly contrived.
 
 TellurideSensor also listens for an incoming stream of sensor health events. A sensor health event relates to a specific sensor and records the min, max and average sensor readings that have been seen as of particular point in time. The idea is that some process might be listening for sensor reading events and computing, and then feeding back, some "analytics" about the sensors - in this case the expectation is some simple aggregate analytics for a sensor (min, max and average sensor reading).
 
@@ -27,6 +27,8 @@ Any number of Sensor processes can be started, each of which is configured with:
 ## Sensor Reading Events
 
 Each sensor will emit a sensor reading event message every 2 seconds.
+
+Sensor reading values are randomly generated, using a normal / Gaussian distribution, from `mean` and `variance` values that are supplied when a sensor is created.
 
 #### Sensor Reading Event Schema
 
