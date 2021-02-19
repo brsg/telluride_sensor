@@ -4,7 +4,7 @@ defmodule TellurideSensor.Sensors.Sensor do
   alias TellurideSensor.Messaging.SensorEventProducer
   alias TellurideSensor.Sensors.SensorRegistry
 
-  @emit_interval_ms 2_000
+  @emit_interval_ms 500
 
   ################################################################################
   # Client interface
