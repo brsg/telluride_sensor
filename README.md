@@ -16,11 +16,11 @@ To run TellurideSensor, see the [Getting Started](#getting-started) section belo
 
 ## Stack
 
-Elixir
+[Elixir](https://elixir-lang.org/)
 
 <img src="https://elixir-lang.org/images/logo/logo.png" height="60" />
 
-RabbitMQ
+[RabbitMQ](https://www.rabbitmq.com/)
 
 <img src="https://avatars.githubusercontent.com/u/96669?s=200&v=4" height="60" />
 
