@@ -4,7 +4,7 @@ defmodule TellurideSensor.Sensors.Sensor do
   alias TellurideSensor.Messaging.SensorEventProducer
   alias TellurideSensor.Sensors.SensorRegistry
 
-  @emit_interval_ms 500
+  @emit_interval_ms 50
 
   ################################################################################
   # Client interface
@@ -49,9 +49,7 @@ defmodule TellurideSensor.Sensors.Sensor do
   end
 
   def handle_info({:rmq_update, %{} = update_map}, %{config: sensor_config} = config_map) do
-
     Scenic.Sensor.publish(sensor_config[:sensor_id], {:update, update_map})
-
     {:noreply, config_map}
   end
 
