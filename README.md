@@ -14,6 +14,20 @@ RabbitMQ is used to publish and consume sensor events.
 
 To run TellurideSensor, see the [Getting Started](#getting-started) section below.
 
+## Stack
+
+[Elixir](https://elixir-lang.org/)
+
+<img src="https://elixir-lang.org/images/logo/logo.png" height="60" />
+
+[RabbitMQ](https://www.rabbitmq.com/)
+
+<img src="https://avatars.githubusercontent.com/u/96669?s=200&v=4" height="60" />
+
+with:
+* [amqp](https://github.com/pma/amqp) library
+* [scenic](https://github.com/boydm/scenic) library
+
 ## Sensors
 
 Any number of Sensor processes can be started, each of which is configured with: 
