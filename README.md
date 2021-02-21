@@ -40,7 +40,7 @@ Any number of Sensor processes can be started, each of which is configured with:
 
 ## Sensor Reading Events
 
-Each sensor will emit a sensor reading event message every 2 seconds.
+Each sensor will emit a sensor reading event message every N milliseconds (see @emit_interval_ms in TellurideSensor.Sensors.Sensor).
 
 Sensor reading values are randomly generated, using a normal / Gaussian distribution, from `mean` and `variance` values that are supplied when a sensor is created.
 
