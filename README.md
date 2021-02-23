@@ -140,23 +140,6 @@ cd telluride_ui/
 iex -S mix
 ```
 
-## Installation
-
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `telluride_pipeline` to your list of dependencies in `mix.exs`:
-
-```elixir
-def deps do
-  [
-    {:telluride_pipeline, "~> 0.1.0"}
-  ]
-end
-```
-
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/telluride_pipeline](https://hexdocs.pm/telluride_pipeline).
-
 ## Consulting or Partnership
 
 If you need help with your Elixir projects, contact <info@brsg.io> or visit <https://brsg.io>.
