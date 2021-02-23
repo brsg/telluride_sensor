@@ -1,4 +1,7 @@
 defmodule TellurideSensor.Sensors.SensorRegistry do
+  @moduledoc """
+  SensorRegistry is a local registry for Sensor genservers.
+  """
 
   def start_link do
     Registry.start_link(keys: :unique, name: __MODULE__)

@@ -1,4 +1,9 @@
 defmodule TellurideSensor.Messaging.SensorHealthQueue do
+  @moduledoc """
+  SensorHealthQueue models the `sensor_health_queue` in RabbitMQ and
+  provides consistent logic and configuration for creating producers
+  and consumers on that queue.
+  """
 
   @exchange         "sensor_events"
 

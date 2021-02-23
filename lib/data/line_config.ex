@@ -1,4 +1,7 @@
 defmodule TellurideSensor.Data.LineConfig do
+  @moduledoc """
+  LineConfig manages the list of devices for a single manufacturing line.
+  """
   use GenServer
 
   alias TellurideSensor.Data.Device
@@ -57,7 +60,7 @@ defmodule TellurideSensor.Data.LineConfig do
   defp add_device(line_key, sensor_type, config_map) do
     device_list = Map.get(config_map, line_key)
     list_size = Enum.count(device_list)
-    IO.inspect(list_size, label: "list_size: ")
+    # IO.inspect(list_size, label: "list_size: ")
     case  list_size < @max_devices do
       true ->
         next_device = compose_next_device(line_key, device_list, sensor_type)

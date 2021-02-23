@@ -1,4 +1,9 @@
 defmodule TellurideSensor.Messaging.SensorReadingQueue do
+  @moduledoc """
+  SensorReadingQueue models the `sensor_reading_queue` in RabbitMQ and
+  provides consistent logic and configuration for creating producers
+  and consumers on that queue.
+  """
 
   @exchange         "sensor_events"
 

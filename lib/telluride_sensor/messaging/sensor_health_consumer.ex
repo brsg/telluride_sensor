@@ -1,4 +1,8 @@
 defmodule TellurideSensor.Messaging.SensorHealthConsumer do
+  @moduledoc """
+  SensorHealthConsumer is responsible for consuming sensor health
+  events from the `SensorHealthQueue`.
+  """
   use GenServer
   use AMQP
 

@@ -1,4 +1,13 @@
 defmodule TellurideSensor.Messaging.AMQPConnectionManager do
+  @moduledoc """
+  AMQPConnectionManager manages a single RabbitMQ Connection and
+  vends Channels on that connection to consumers.
+
+  A consumer that needs a Channel can call `request_channel/1`, passing
+  itself as the argument. `AMQPConnectionManager` will allocate a
+  Channel and call back to the requesting consumer with `channel_available/1`,
+  passing the channel as the argument.
+  """
   use GenServer
   use AMQP
 

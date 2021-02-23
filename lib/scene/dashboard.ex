@@ -1,4 +1,8 @@
 defmodule TellurideSensor.Scene.Dashboard do
+  @moduledoc """
+  Dashboard configures and manages a [Scenic](https://github.com/boydm/scenic)-based
+  UI for visualizing the "sensor network" used in this example.
+  """
   use Scenic.Scene
 
   require Logger
@@ -93,12 +97,12 @@ defmodule TellurideSensor.Scene.Dashboard do
   end
 
   def handle_info({:sensor, :registered, {_sensor_id, _version, _description}} = data, graph) do
-    IO.inspect(data, label: "dashboard handle_info registered: ")
+    # IO.inspect(data, label: "dashboard handle_info registered: ")
     {:noreply, graph, push: graph}
   end
 
   def handle_info({:sensor, :data, {_sensor_id, _reading, _}} = data, graph) do
-    IO.inspect(data, label: "dashboard handle_info data: ")
+    # IO.inspect(data, label: "dashboard handle_info data: ")
     # reading_rounded =
       # reading
       # |> :erlang.float_to_binary(decimals: 2)
@@ -112,7 +116,7 @@ defmodule TellurideSensor.Scene.Dashboard do
       |> Graph.reduce(
         graph, fn primitive, accum_graph ->
           primitive_id = Map.get(primitive, :id)
-          if (String.contains?(to_string(primitive_id), "col_")) do
+          if String.contains?(to_string(primitive_id), "col_") do
             Graph.delete(accum_graph, primitive_id)
           else
             accum_graph
@@ -129,7 +133,7 @@ defmodule TellurideSensor.Scene.Dashboard do
     case LineConfig.add_pressure_device(mfg_line) do
       {:ok, %Device{} = next} ->
         SensorSupervisor.start_sensor(next.sensor_type, mfg_line, next.device, Device.get_id(next), random_mean(), random_variance())
-        |> IO.inspect(label: "start_sensor pressure: ")
+        # |> IO.inspect(label: "start_sensor pressure: ")
         Logger.info("New pressure device for line one, #{inspect next}.")
       {:max_devices, _} -> Logger.warn("Max devices reached for line one")
     end
@@ -140,7 +144,7 @@ defmodule TellurideSensor.Scene.Dashboard do
     case LineConfig.add_temperature_device(mfg_line) do
       {:ok, %Device{} = next} ->
         SensorSupervisor.start_sensor(next.sensor_type, mfg_line, next.device, Device.get_id(next), random_mean(), random_variance())
-        |> IO.inspect(label: "start_sensor temperature: ")
+        # |> IO.inspect(label: "start_sensor temperature: ")
         Logger.info("New temperature device for line one, #{inspect next}.")
       {:max_devices, _} -> Logger.warn("Max devices reached for line one")
     end
@@ -151,7 +155,7 @@ defmodule TellurideSensor.Scene.Dashboard do
     case LineConfig.add_viscosity_device(mfg_line) do
       {:ok, %Device{} = next} ->
         SensorSupervisor.start_sensor(next.sensor_type, mfg_line, next.device, Device.get_id(next), random_mean(), random_variance())
-        |> IO.inspect(label: "start_sensor viscosity: ")
+        # |> IO.inspect(label: "start_sensor viscosity: ")
         Logger.info("New viscosity device for line one, #{inspect next}.")
       {:max_devices, _} -> Logger.warn("Max devices reached for line one")
     end

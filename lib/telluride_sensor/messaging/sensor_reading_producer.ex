@@ -1,4 +1,8 @@
 defmodule TellurideSensor.Messaging.SensorEventProducer do
+  @moduledoc """
+  SensorEventProducer is responsible for publishging sensor reading
+  events to the `SensorReadingQueue`.
+  """
   use GenServer
 
   alias __MODULE__

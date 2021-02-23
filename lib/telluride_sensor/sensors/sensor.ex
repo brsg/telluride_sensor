@@ -1,4 +1,22 @@
 defmodule TellurideSensor.Sensors.Sensor do
+  @moduledoc """
+  Sensor models a single sensor in a hypothetical IoT-style sensor network.
+
+  A Sensor is created and started by calling Sensor.start_link/2 with a
+  sensor configuration map having the following elements:
+  * `sensor_type` - :pressure, :viscosity, :temperature or other
+  * `line_id` - id of the manufacturing line on which the sensor exists
+  * `device_id` - id of the device which the sensor is monitoring
+  * `sensor_id` - id of the sensor itself
+  * `mean` - the mean value to be used to generate random sensor readings using `variance` and a normal distribution
+  * `variance` - the variance to be used to generate random sensor readings using `mean` and a normal distribution
+
+  `@emit_interval_ms` determines how often the Sensor will generate a new reading.
+
+  As currently implemented, a Sensor will publish each reading to to event channels:
+  * SensorEventProducer - produces the event to a RabbitMQ queue
+  * Scenic.Sensor - produces the event to the PubSub topic that the Scenic-based UI is listeing on
+  """
   use GenServer, restart: :temporary
 
   alias TellurideSensor.Messaging.SensorEventProducer

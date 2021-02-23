@@ -1,4 +1,7 @@
 defmodule TellurideSensor.Sensors.SensorSupervisor do
+  @moduledoc """
+  SensorSupervisor is responsible for managing a collection of Sensors.
+  """
   use DynamicSupervisor
 
   alias TellurideSensor.Sensors.Sensor

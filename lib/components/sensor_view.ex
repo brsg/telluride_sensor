@@ -16,7 +16,7 @@ defmodule TellurideSensor.Component.SensorView do
   def verify(_), do: :invalid_data
 
   def init(reading, opts) do
-    IO.inspect(opts, label: "sensor_view init opts: ")
+    # IO.inspect(opts, label: "sensor_view init opts: ")
     width = opts[:styles][:width]
     height = opts[:styles][:height]
     # device_id = opts[:styles][:device_id]
@@ -65,7 +65,7 @@ defmodule TellurideSensor.Component.SensorView do
   end
 
   def handle_info({:sensor, :registered, {_sensor_id, _version, _description}} = data, graph) do
-    IO.inspect(data, label: "sensor_view handle_info registered: ")
+    # IO.inspect(data, label: "sensor_view handle_info registered: ")
     {:noreply, graph, push: graph}
   end
 
