@@ -12,7 +12,7 @@ TellurideSensor also listens for an incoming stream of sensor health events. A s
 
 RabbitMQ is used to publish and consume sensor events.
 
-To run TellurideSensor, see the [Getting Started](#getting-started) section below.
+See [Getting Started](#getting-started) below for instructions on starting this example.
 
 ## Stack
 
@@ -99,19 +99,63 @@ A sensor health event is expected to have the following structure:
 
 ## <a name="getting-started"></a> Getting Started
 
-1. Start RabbitMQ
-```
-    $ cd telluride_sensor
+1. Start RabbitMQ.
 
-    $ bin/rmq-up.sh   (or docker-compose up [-d])
+A `docker-compose.yaml` that includes RabbitMQ is provided in `telluride_pipeline`. Start RabbitMQ by executing:
+
+```elixir
+cd telluride_pipeline/
+docker-compose up -d
 ```
 
-2. Start the TellurideSensor application
-```
-    $ cd telluride_sensor
+2. Start [TellurideSensor](https://github.com/brsg/telluride_sensor) by executing:
 
-    $ iex -S mix
+```elixir
+cd telluride_sensor/
+iex -S mix
 ```
+
+3. Start [TelluridePipeline](https://github.com/brsg/telluride_pipeline) by executing:
+
+```Elixir
+cd telluride_pipeline/
+iex -S mix
+```
+
+and then, from within iex, execute:
+
+```
+TelluridePipeline.TelemetryBroadwayManager.start_or_replace_telluride_pipeline/1
+```
+
+To run the `telluride_pipeline` tests:
+
+```elixir
+mix test --only telemetry_broadway
+```
+
+4. Start [TellurideUI](https://github.com/brsg/telluride_ui) by executing:
+```Elixir
+cd telluride_ui/
+iex -S mix
+```
+
+## Installation
+
+If [available in Hex](https://hex.pm/docs/publish), the package can be installed
+by adding `telluride_pipeline` to your list of dependencies in `mix.exs`:
+
+```elixir
+def deps do
+  [
+    {:telluride_pipeline, "~> 0.1.0"}
+  ]
+end
+```
+
+Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
+and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
+be found at [https://hexdocs.pm/telluride_pipeline](https://hexdocs.pm/telluride_pipeline).
 
 ## Consulting or Partnership
 
