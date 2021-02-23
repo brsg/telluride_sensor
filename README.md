@@ -108,14 +108,7 @@ cd telluride_pipeline/
 docker-compose up -d
 ```
 
-2. Start [TellurideSensor](https://github.com/brsg/telluride_sensor) by executing:
-
-```elixir
-cd telluride_sensor/
-iex -S mix
-```
-
-3. Start [TelluridePipeline](https://github.com/brsg/telluride_pipeline) by executing:
+2. Start [TelluridePipeline](https://github.com/brsg/telluride_pipeline) by executing:
 
 ```Elixir
 cd telluride_pipeline/
@@ -132,6 +125,13 @@ To run the `telluride_pipeline` tests:
 
 ```elixir
 mix test --only telemetry_broadway
+```
+
+3. Start [TellurideSensor](https://github.com/brsg/telluride_sensor) by executing:
+
+```elixir
+cd telluride_sensor/
+iex -S mix
 ```
 
 4. Start [TellurideUI](https://github.com/brsg/telluride_ui) by executing:
