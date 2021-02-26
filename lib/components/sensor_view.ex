@@ -48,7 +48,7 @@ defmodule TellurideSensor.Component.SensorView do
           )
           |> text(
             update_text, id: update_text_id, font_size: @font_size,
-            fill: :white, t: {width * 0.05, height * 0.60}
+            fill: :white, t: {width * 0.12, height * 0.60}
           )
           |> text(
             reading_text, id: text_id, font_size: @font_size,
