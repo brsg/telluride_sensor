@@ -5,6 +5,7 @@ defmodule TellurideSensor.Component.SensorView do
   alias Scenic.Sensor
 
   import Scenic.Primitives    #, only: [{:text, 3}, {:rect, 3}]
+  import Scenic.Components
 
   @font_size 14
   @radius 10
@@ -52,6 +53,10 @@ defmodule TellurideSensor.Component.SensorView do
           |> text(
             reading_text, id: text_id, font_size: @font_size,
             fill: :white, t: {width * 0.80, height * 0.60}
+          )
+          |> button("X", width: 20, height: 20, id: {"remove_sensor", sensor_id},
+            theme: :danger, t: {width * 0.02, height * 0.15},
+            align: :center, font_size: 14
           )
         end
       )

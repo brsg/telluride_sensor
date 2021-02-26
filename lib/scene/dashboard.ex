@@ -96,6 +96,11 @@ defmodule TellurideSensor.Scene.Dashboard do
     build_and_push_graph(event, graph)
   end
 
+  def filter_event({:click, {"remove_sensor", _sensor_id}} = event, _, graph) do
+    IO.inspect(event, label: "\nremove:\t")
+    build_and_push_graph(event, graph)
+  end
+
   def handle_info({:sensor, :registered, {_sensor_id, _version, _description}} = data, graph) do
     # IO.inspect(data, label: "dashboard handle_info registered: ")
     {:noreply, graph, push: graph}
