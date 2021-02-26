@@ -69,12 +69,17 @@ defmodule TellurideSensor.Component.SensorView do
     {:ok, %{graph: graph, viewport: opts[:viewport], opts: opts}, push: graph}
   end
 
-  def handle_info({:sensor, :registered, {_sensor_id, _version, _description}} = data, graph) do
+  def handle_info({:sensor, :registered, {_sensor_id, _version, _description}} = _data, graph) do
     # IO.inspect(data, label: "sensor_view handle_info registered: ")
     {:noreply, graph, push: graph}
   end
 
-  def handle_info({:sensor, :data, {sensor_id, {:update, update_map}, _}} = data , graph_map) do
+  def handle_info({:sensor, :unregistered, _sensor_id} = _data, graph) do
+    # IO.inspect(data, label: "sensor_view handle_info registered: ")
+    {:noreply, graph, push: graph}
+  end
+
+  def handle_info({:sensor, :data, {sensor_id, {:update, update_map}, _}} = _data , graph_map) do
 
     mean_value = Float.round(update_map["mean"], 2)
     min_value = Float.round(update_map["min"])

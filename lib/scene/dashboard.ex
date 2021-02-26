@@ -97,23 +97,23 @@ defmodule TellurideSensor.Scene.Dashboard do
   end
 
   def filter_event({:click, {"remove_sensor", sensor_id}} = event, _, graph) do
-    IO.inspect(event, label: "\nremove:\t")
     case fetch_sensor(sensor_id) do
       nil ->
         Logger.error("sensor #{inspect sensor_id} already removed")
-      {_sensor_id, _line_id, _device_id, _pid} = sensor ->
-        IO.inspect(sensor, label: "\nsensor:\t")
-
+      {sensor_id, _line_id, _device_id, pid} = _sensor ->
+        SensorSupervisor.stop_sensor(pid)
+        LineConfig.remove_device(sensor_id)
+        Logger.info("Removed sensor identified by #{inspect sensor_id}")
     end
     build_and_push_graph(event, graph)
   end
 
-  def handle_info({:sensor, :registered, {_sensor_id, _version, _description}} = data, graph) do
+  def handle_info({:sensor, :registered, {_sensor_id, _version, _description}} = _data, graph) do
     # IO.inspect(data, label: "dashboard handle_info registered: ")
     {:noreply, graph, push: graph}
   end
 
-  def handle_info({:sensor, :data, {_sensor_id, _reading, _}} = data, graph) do
+  def handle_info({:sensor, :data, {_sensor_id, _reading, _}} = _data, graph) do
     # IO.inspect(data, label: "dashboard handle_info data: ")
     # reading_rounded =
       # reading
