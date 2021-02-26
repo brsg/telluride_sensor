@@ -96,8 +96,10 @@ defmodule TellurideSensor.Scene.Dashboard do
     build_and_push_graph(event, graph)
   end
 
-  def filter_event({:click, {"remove_sensor", _sensor_id}} = event, _, graph) do
+  def filter_event({:click, {"remove_sensor", sensor_id}} = event, _, graph) do
     IO.inspect(event, label: "\nremove:\t")
+    sensor = fetch_sensor(sensor_id)
+    IO.inspect(sensor, label: "\nsensor:\t")
     build_and_push_graph(event, graph)
   end
 
@@ -269,6 +271,13 @@ defmodule TellurideSensor.Scene.Dashboard do
 
   defp random_variance() do
     Enum.random(1..13) / 1
+  end
+
+  defp fetch_sensor(sensor_id_wanted) when is_atom(sensor_id_wanted) do
+    Scenic.Sensor.list()
+    |> Enum.filter(fn {sensor_id, _line_id, _device_id, _pid} ->
+      sensor_id == sensor_id_wanted
+    end)
   end
 
 end
