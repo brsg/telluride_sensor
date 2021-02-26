@@ -98,8 +98,13 @@ defmodule TellurideSensor.Scene.Dashboard do
 
   def filter_event({:click, {"remove_sensor", sensor_id}} = event, _, graph) do
     IO.inspect(event, label: "\nremove:\t")
-    sensor = fetch_sensor(sensor_id)
-    IO.inspect(sensor, label: "\nsensor:\t")
+    case fetch_sensor(sensor_id) do
+      nil ->
+        Logger.error("sensor #{inspect sensor_id} already removed")
+      {_sensor_id, _line_id, _device_id, _pid} = sensor ->
+        IO.inspect(sensor, label: "\nsensor:\t")
+
+    end
     build_and_push_graph(event, graph)
   end
 
@@ -278,6 +283,7 @@ defmodule TellurideSensor.Scene.Dashboard do
     |> Enum.filter(fn {sensor_id, _line_id, _device_id, _pid} ->
       sensor_id == sensor_id_wanted
     end)
+    |> List.first()
   end
 
 end
