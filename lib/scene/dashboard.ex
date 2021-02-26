@@ -109,16 +109,10 @@ defmodule TellurideSensor.Scene.Dashboard do
   end
 
   def handle_info({:sensor, :registered, {_sensor_id, _version, _description}} = _data, graph) do
-    # IO.inspect(data, label: "dashboard handle_info registered: ")
     {:noreply, graph, push: graph}
   end
 
   def handle_info({:sensor, :data, {_sensor_id, _reading, _}} = _data, graph) do
-    # IO.inspect(data, label: "dashboard handle_info data: ")
-    # reading_rounded =
-      # reading
-      # |> :erlang.float_to_binary(decimals: 2)
-    # graph = Graph.modify(graph, sensor_id, &text(&1, reading_rounded))
     {:noreply, graph, push: graph}
   end
 
