@@ -5,7 +5,7 @@ use Mix.Config
 # Configure the main viewport for the Scenic application
 config :telluride_sensor, :viewport, %{
   name: :main_viewport,
-  size: {800, 600},
+  size: {860, 600},
   default_scene: {TellurideSensor.Scene.Splash, TellurideSensor.Scene.Dashboard},
   drivers: [
     %{

@@ -36,6 +36,10 @@ defmodule TellurideSensor.Data.LineConfig do
     GenServer.call(__MODULE__, {:find, mfg_line})
   end
 
+  def remove_device(sensor_id) when is_atom(sensor_id) do
+    GenServer.cast(__MODULE__, {:remove, sensor_id})
+  end
+
   ## Server callbacks
 
   def init(_args) do
@@ -56,7 +60,31 @@ defmodule TellurideSensor.Data.LineConfig do
     {:reply, result, map}
   end
 
+  def handle_cast({:remove, sensor_id}, config_map) do
+    device_id = device_id_from_sensor_id(sensor_id)
+
+    config_map_prime =
+      config_map
+      |> remove_if_found(device_id, :line_one)
+      |> remove_if_found(device_id, :line_two)
+      |> remove_if_found(device_id, :line_three)
+
+    {:noreply, config_map_prime}
+  end
+
   ## Helping
+  defp remove_if_found(%{} = config_map, device_id, key) do
+    list_prime =
+      Map.get(config_map, key)
+      |> Enum.reject(fn %Device{} = device -> device.device == device_id end)
+
+    Map.put(config_map, key, list_prime)
+  end
+
+  defp device_id_from_sensor_id(sensor_id) when is_atom(sensor_id) do
+    sensor_id |> to_string() |> String.split("::") |> List.last()
+  end
+
   defp add_device(line_key, sensor_type, config_map) do
     device_list = Map.get(config_map, line_key)
     list_size = Enum.count(device_list)

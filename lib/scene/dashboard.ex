@@ -96,17 +96,23 @@ defmodule TellurideSensor.Scene.Dashboard do
     build_and_push_graph(event, graph)
   end
 
-  def handle_info({:sensor, :registered, {_sensor_id, _version, _description}} = data, graph) do
-    # IO.inspect(data, label: "dashboard handle_info registered: ")
+  def filter_event({:click, {"remove_sensor", sensor_id}} = event, _, graph) do
+    case fetch_sensor(sensor_id) do
+      nil ->
+        Logger.error("sensor #{inspect sensor_id} already removed")
+      {sensor_id, _line_id, _device_id, pid} = _sensor ->
+        SensorSupervisor.stop_sensor(pid)
+        LineConfig.remove_device(sensor_id)
+        Logger.info("Removed sensor identified by #{inspect sensor_id}")
+    end
+    build_and_push_graph(event, graph)
+  end
+
+  def handle_info({:sensor, :registered, {_sensor_id, _version, _description}} = _data, graph) do
     {:noreply, graph, push: graph}
   end
 
-  def handle_info({:sensor, :data, {_sensor_id, _reading, _}} = data, graph) do
-    # IO.inspect(data, label: "dashboard handle_info data: ")
-    # reading_rounded =
-      # reading
-      # |> :erlang.float_to_binary(decimals: 2)
-    # graph = Graph.modify(graph, sensor_id, &text(&1, reading_rounded))
+  def handle_info({:sensor, :data, {_sensor_id, _reading, _}} = _data, graph) do
     {:noreply, graph, push: graph}
   end
 
@@ -264,6 +270,14 @@ defmodule TellurideSensor.Scene.Dashboard do
 
   defp random_variance() do
     Enum.random(1..13) / 1
+  end
+
+  defp fetch_sensor(sensor_id_wanted) when is_atom(sensor_id_wanted) do
+    Scenic.Sensor.list()
+    |> Enum.filter(fn {sensor_id, _line_id, _device_id, _pid} ->
+      sensor_id == sensor_id_wanted
+    end)
+    |> List.first()
   end
 
 end
